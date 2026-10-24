@@ -2,6 +2,7 @@ __pycache__/
 *.pyc
 .venv/
 .vscode/
+temp/
 
 # large CSVs, committed as .csv.gz (scripts/pack_for_git.py)
 runs/One_hr_drift_test/imu.csv
@@ -12,3 +13,4 @@ runs/One_hr_drift_test/raw_gyro.csv
 simulation/ros2_ws/build/
 simulation/ros2_ws/install/
 simulation/ros2_ws/log/
+simulation/ros2_ws/snapshots/

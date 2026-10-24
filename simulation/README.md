@@ -11,13 +11,33 @@ Everything runs in Docker (Ubuntu 24.04, ROS 2 Jazzy, Gazebo Harmonic). No param
 
 ## Control architecture ("idealised controller")
 ```
-gz sim (world: floor, 22 tags, 8 anchors, x500_tagcam_0)
-  |-- x500 motors, PX4 sim IMU/baro/mag ----- PX4 gz_bridge ----- PX4 SITL (EKF2 + position/attitude/rate loops)
-  |-- our camera, /imu/ideal, /imu/noisy, GT OdometryPublisher -- ros_gz_bridge -- ROS 2
-ROS 2:  gt_to_px4_ev_node : /ground_truth/odom (ENU/FLU) --> /fmu/in/vehicle_visual_odometry (NED/FRD) --+
-        px4_mission_node  : offboard_control_mode + trajectory_setpoint + vehicle_command  --> /fmu/in/* |
-                                                            Micro XRCE-DDS Agent (udp4 :8888) <---------+--> PX4
+              gz sim  (Gazebo Harmonic)
+  world: floor, 22 tags, 8 UWB anchors, x500_tagcam_0
+        |                            |
+  x500 motors +             our sensors:
+  PX4 sim IMU/baro/mag      camera, /imu/ideal,
+        |                   /imu/noisy, GT odometry
+   PX4 gz_bridge                     |
+        |                      ros_gz_bridge
+        v                            v
+ +--------------+            +----------------+
+ |   PX4 SITL   |            |     ROS 2      |
+ | EKF2 + pos / |  XRCE-DDS  | mission, EV,   |
+ | att / rate   |<---------->| UWB, tf,       |
+ | loops        | udp 8888   | apriltag nodes |
+ +--------------+            +----------------+
 ```
+
+| ROS 2 node | Subscribes | Publishes |
+|---|---|---|
+| `px4_mission_node` | `/ground_truth/odom`, `/fmu/out/vehicle_status_v1`, `/fmu/out/vehicle_local_position` | `/fmu/in/offboard_control_mode`, `/fmu/in/trajectory_setpoint`, `/fmu/in/vehicle_command`, `/controller/status`, `/trajectory/reference` |
+| `gt_to_px4_ev_node` | `/ground_truth/odom` (ENU/FLU) | `/fmu/in/vehicle_visual_odometry` (NED/FRD) |
+| `uwb_node` | `/ground_truth/odom` (simulated ranges from GT) | `/uwb/ranges` |
+| `uwb_multilateration_node` | `/uwb/ranges` | `/uwb/position` |
+| `tf_node` | `/ground_truth/odom` | TF tree, `/ground_truth/pose` |
+| `apriltag` (apriltag_ros) | `/camera/image_raw`, `/camera/camera_info` | `/detections` |
+| `gz_bridge` (ros_gz_bridge) | gz topics | `/clock`, `/ground_truth/odom`, camera, IMUs |
+
 * PX4 EKF2 fuses **ground truth as external vision** (position, velocity, yaw; `EKF2_EV_CTRL=15`, height reference =
   vision, GPS/baro/mag fusion off, tiny noise). Physics are real: PX4 commands motors, the gz motor model produces thrust, nothing is teleported.
 * PX4 uses its own simulated IMU (`x500_base` `imu_sensor`) for its estimator and attitude loops. Our `/imu/ideal` and
@@ -29,32 +49,58 @@ ROS 2:  gt_to_px4_ev_node : /ground_truth/odom (ENU/FLU) --> /fmu/in/vehicle_vis
 * Traversals are counted from ground truth: a traversal is done when the reference profile finished, along-track error < 5 cm and speed < 0.05 m/s.
 
 ## Exact commands
+Everything goes through `docker/run.sh`. It keeps one named, long-lived container (`drone_sim`; `drone_sim_base` with
+`DRONE_SIM_SERVICE=base`) and runs each command in it with `docker exec`, with ROS 2, px4_msgs and `/ws` sourced by
+`docker/entrypoint.sh`.
 ```bash
-# 1. build the image (PX4 + XRCE agent + px4_msgs underlay; long, ~RAM 15 GB host: PX4 build uses 6 jobs)
-cd simulation/docker && ./build.sh                 # -> drone_sim:px4   (./build.sh base -> drone_sim:base only)
-
-# 2. start a container (X11 + NVIDIA, host network, ../ros2_ws mounted at /ws)
-./run.sh                                           # allow X: xhost +local:docker (run.sh does it)
-
-# 3. inside the container: build only our packages (px4_msgs is already in /opt/px4_ws)
-cd /ws && colcon build --symlink-install && source install/setup.bash
-
-# 4. launch
-ros2 launch drone_sim sim.launch.py                       # Gazebo GUI + PX4 + everything
-ros2 launch drone_sim sim.launch.py headless:=true        # no GUI, headless rendering (camera still renders)
-ros2 launch drone_sim sim.launch.py px4:=false            # world + sensors + detector only (no PX4, no flight)
-ros2 launch drone_sim sim.launch.py detector:=false config_dir:=/path/to/config
-
-# 5. watch it
-ros2 topic echo /controller/status
-ros2 topic echo /uwb/position
-ros2 run rqt_image_view rqt_image_view /camera/image_raw     # needs X11 (run.sh forwards it)
-gz sim -g                                                    # attach a GUI to a headless server
+cd simulation/docker
+./run.sh image                 # build drone_sim:px4 (PX4 + XRCE agent + px4_msgs; long, PX4 uses 6 jobs ~ 15 GB RAM)
+./run.sh                       # start container, colcon build, launch the full sim with the Gazebo GUI (Ctrl+C stops it)
+./run.sh headless              # same without GUI; extra launch args pass through: ./run.sh headless detector:=false
+./run.sh bash                  # shell in the running container
+./run.sh exec ros2 topic echo /uwb/position
+./run.sh ctl                   # echo /controller/status      | ./run.sh topics | ./run.sh camera (rqt_image_view)
+./run.sh gui                   # attach a Gazebo GUI to a headless sim
+./run.sh build                 # colcon build only (needed after editing config/*.yaml)
+./run.sh kill                  # stop the sim, keep the container  | ./run.sh status | ./run.sh logs
+./run.sh down                  # stop and remove the container
+./run.sh help                  # full list
 ```
+Networking: host network (X11, `gz sim -g` and host ROS 2 tools work directly), but discovery is limited to this machine
+(`ROS_AUTOMATIC_DISCOVERY_RANGE=LOCALHOST`, `GZ_IP=127.0.0.1`, `ROS_DOMAIN_ID=42`; override with the same env vars).
+Only one sim can run per machine: two host-network sims would mix their gz/PX4 topics.
 Launch args: `headless` (false), `gui` (true), `detector` (true), `px4` (true), `reset_params` (true: deletes PX4
 `parameters.bson` so airframe changes apply), `px4_dir` (default `$PX4_DIR`), `config_dir`.
 Camera view without X: run headless and use `ros2 run image_view image_saver` or `ros2 bag record /camera/image_raw`.
 Without a GPU, drop `runtime: nvidia` in `docker/docker-compose.yml` and use `headless:=true` (software EGL, slow).
+
+## Looking at the sensors
+From the host, while a sim is running (`./run.sh help` lists everything):
+```bash
+./run.sh camera                # live camera window: AprilTag outlines + ids + camera height (q / Esc closes)
+./run.sh camera raw            # plain rqt_image_view
+./run.sh snapshot [name.png]   # one annotated frame -> simulation/ros2_ws/snapshots/
+./run.sh tags                  # AprilTag detections (id, pixel centre, corners)
+./run.sh imu [ideal|noisy]     # IMU messages (default noisy)
+./run.sh uwb [ranges]          # UWB position fix, or the 8 raw ranges
+./run.sh odom                  # ground-truth pose
+./run.sh ctl                   # mission state, traversals done, tracking error
+./run.sh hz /camera/image_raw  # rate of any topic   |   ./run.sh echo <topic> [--once]   |   ./run.sh graph
+```
+Inside the container (`./run.sh bash`, ROS already sourced):
+```bash
+ros2 topic list                                        # every topic
+ros2 topic echo /imu/noisy --once                      # one message
+ros2 topic echo /detections --field detections         # only the detections
+ros2 topic echo /uwb/position --field pose.pose.position
+ros2 topic hz /imu/noisy                               # rate (200 Hz expected)
+ros2 run drone_sim camera_view                         # camera window with detections
+ros2 run drone_sim camera_view --save /ws/snapshots/frame.png
+ros2 run rqt_image_view rqt_image_view /camera/image_raw
+ros2 run tf2_tools view_frames                         # TF tree -> frames.pdf
+ros2 bag record /imu/noisy /imu/ideal /camera/image_raw /camera/camera_info /detections /uwb/ranges /ground_truth/odom
+gz topic -l                                            # Gazebo-side topics
+```
 
 ## Sources and pinned revisions
 | Component | Repo | Revision |

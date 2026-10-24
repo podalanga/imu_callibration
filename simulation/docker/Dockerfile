@@ -69,4 +69,9 @@ ENV GZ_SIM_RESOURCE_PATH=${PX4_DIR}/Tools/simulation/gz/models:${PX4_DIR}/Tools/
 ENV GZ_SIM_SYSTEM_PLUGIN_PATH=${PX4_DIR}/build/px4_sitl_default/src/modules/simulation/gz_plugins
 RUN echo 'source /opt/ros/jazzy/setup.bash; source /opt/px4_ws/install/setup.bash; \
 [ -f /ws/install/setup.bash ] && source /ws/install/setup.bash' >> /root/.bashrc
+
+# Sources ROS + px4_msgs + /ws overlay for every command (docker run, and run.sh's docker exec).
+COPY --chmod=0755 entrypoint.sh /entrypoint.sh
+ENTRYPOINT ["/entrypoint.sh"]
+CMD ["bash"]
 WORKDIR /ws

@@ -43,6 +43,7 @@ setup(
             'uwb_node = drone_sim.uwb_node:main',
             'tf_node = drone_sim.tf_node:main',
             'world_gen = drone_sim.world_gen:cli',
+            'camera_view = drone_sim.camera_view:main',
         ],
     },
 )

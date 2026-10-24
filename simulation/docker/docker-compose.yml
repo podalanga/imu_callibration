@@ -1,28 +1,40 @@
-# Usage: ./run.sh   (or: docker compose run --rm sim bash)
+# drone_sim dev containers. Normally driven through ./run.sh (see `./run.sh help`).
+# One long-lived, named container per service; commands are run in it with `docker exec`.
+name: drone_sim
+
 x-common: &common
   runtime: nvidia
+  # Host networking: X11, gz GUI attach and host-side ROS 2 tools work without port mapping.
+  # Discovery is limited to this machine (ROS_AUTOMATIC_DISCOVERY_RANGE, GZ_IP) so the sim is not
+  # visible to, and cannot be commanded from, other hosts on the LAN.
   network_mode: host
   ipc: host
-  privileged: false
+  init: true                         # reap zombies left by gz / PX4 restarts
+  entrypoint: ["/entrypoint.sh"]
+  command: ["sleep", "infinity"]     # keep the container up; work happens via `docker exec`
   environment:
     - DISPLAY=${DISPLAY:-:0}
     - QT_X11_NO_MITSHM=1
     - NVIDIA_VISIBLE_DEVICES=all
     - NVIDIA_DRIVER_CAPABILITIES=all
-    - ROS_DOMAIN_ID=${ROS_DOMAIN_ID:-0}
+    - ROS_DOMAIN_ID=${ROS_DOMAIN_ID:-42}
+    - ROS_AUTOMATIC_DISCOVERY_RANGE=${ROS_AUTOMATIC_DISCOVERY_RANGE:-LOCALHOST}
+    - GZ_IP=${GZ_IP:-127.0.0.1}
   volumes:
     - /tmp/.X11-unix:/tmp/.X11-unix:rw
     - ../ros2_ws:/ws:rw
+    - ./entrypoint.sh:/entrypoint.sh:ro   # also baked into the image; mounted so edits apply without a rebuild
   working_dir: /ws
-  stdin_open: true
-  tty: true
 
 services:
-  sim:                       # full stack: PX4 SITL + XRCE agent + gz + ROS
+  sim:                               # full stack: PX4 SITL + XRCE agent + gz + ROS
     <<: *common
     image: drone_sim:px4
+    container_name: drone_sim
     build: {context: ., target: px4}
-  base:                      # no PX4: ROS + gz + apriltag (world/render checks, launch with px4:=false)
+  base:                              # no PX4: ROS + gz + apriltag (world/render checks, launch with px4:=false)
     <<: *common
     image: drone_sim:base
+    container_name: drone_sim_base
     build: {context: ., target: base}
+    profiles: [base]
