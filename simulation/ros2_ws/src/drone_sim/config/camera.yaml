@@ -1,0 +1,12 @@
+optical_centre_height_m: 1.10   # target height of the optical centre above the floor
+width: 1920
+height: 1080
+# OnePlus Nord 4 main camera: 1/1.95" 4:3 sensor, 25 mm equivalent focal length (oneplus.com specs).
+# 16:9 video keeps the sensor width: hfov = 2*atan(0.8*21.63/25) = 69.4 deg -> 1.52 m x 0.86 m footprint at 1.10 m
+hfov: 1.2112
+rate_hz: 30
+clip_near: 0.05
+clip_far: 20.0
+image_topic: /camera/image_raw
+info_topic: /camera/camera_info
+frame_id: camera_optical_frame

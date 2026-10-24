@@ -1,0 +1,28 @@
+# Usage: ./run.sh   (or: docker compose run --rm sim bash)
+x-common: &common
+  runtime: nvidia
+  network_mode: host
+  ipc: host
+  privileged: false
+  environment:
+    - DISPLAY=${DISPLAY:-:0}
+    - QT_X11_NO_MITSHM=1
+    - NVIDIA_VISIBLE_DEVICES=all
+    - NVIDIA_DRIVER_CAPABILITIES=all
+    - ROS_DOMAIN_ID=${ROS_DOMAIN_ID:-0}
+  volumes:
+    - /tmp/.X11-unix:/tmp/.X11-unix:rw
+    - ../ros2_ws:/ws:rw
+  working_dir: /ws
+  stdin_open: true
+  tty: true
+
+services:
+  sim:                       # full stack: PX4 SITL + XRCE agent + gz + ROS
+    <<: *common
+    image: drone_sim:px4
+    build: {context: ., target: px4}
+  base:                      # no PX4: ROS + gz + apriltag (world/render checks, launch with px4:=false)
+    <<: *common
+    image: drone_sim:base
+    build: {context: ., target: base}

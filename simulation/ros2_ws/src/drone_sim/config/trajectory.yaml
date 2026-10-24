@@ -1,0 +1,16 @@
+x_left: -5.75
+x_right: 5.75
+y: 0.0
+n_traversals: 5                 # 2.5 rounds (round = there and back); the first goes left -> right, directions alternate
+v_cruise: 0.3                   # slow, constant over ~96% of each 11.5 m pass
+a_max: 0.3
+takeoff_v: 0.4
+takeoff_a: 0.3
+dwell_s: 0.0                    # reverse as soon as the end tolerances are met
+takeoff_settle_s: 5.0           # hover after takeoff until the camera height has settled at 1.10 m
+pos_tol_m: 0.05                 # along-track error at segment end
+vel_tol_mps: 0.05
+land_at_finish: false
+land_v: 0.3
+land_a: 0.3
+land_height_margin_m: 0.03      # final camera height above its on-ground height

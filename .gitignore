@@ -6,3 +6,8 @@ __pycache__/
 runs/One_hr_drift_test/imu.csv
 runs/One_hr_drift_test/raw_acc.csv
 runs/One_hr_drift_test/raw_gyro.csv
+
+# ROS 2 workspace build output (drone_sim)
+simulation/ros2_ws/build/
+simulation/ros2_ws/install/
+simulation/ros2_ws/log/

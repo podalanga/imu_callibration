@@ -1,0 +1,21 @@
+world_name: drone_world
+physics:
+  max_step_size: 0.004          # PX4 default world uses 0.004 (250 Hz)
+  real_time_factor: 1.0
+gravity: [0.0, 0.0, -9.81]
+floor:
+  size: [20.0, 20.0]        # [x, y] metres; = gz GUI default grid (20 x 1 m cells at the origin)
+  center: [0.0, 0.0]        # origin = track centre; tags span x in [-5, 5], UWB cube floor face [-6, 6]^2
+  rgba: [0.55, 0.55, 0.55, 1.0]   # grey concrete
+  mu: 0.9
+  mu2: 0.9
+lighting:
+  ambient: 0.75             # uniform scene ambient (grey level)
+  sun_diffuse: 0.8
+  sun_specular: 0.1
+  sun_direction: [0.0, 0.0, -1.0]
+  cast_shadows: false       # keep false: drone shadow would darken the tags under the camera
+  background: [0.6, 0.7, 0.8, 1.0]
+# Needed by the x500 sensors (magnetometer, navsat, air pressure) that PX4's gz_bridge subscribes to.
+magnetic_field: [6.0e-06, 2.3e-05, -4.2e-05]
+spherical_coordinates: {latitude_deg: 47.397971057728974, longitude_deg: 8.546163739800146, elevation: 488.0}

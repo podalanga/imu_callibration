@@ -1,0 +1,35 @@
+# 8 anchors on the corners of a 12 x 12 x 12 m cube. The cube's floor face is centred on the track centre
+# (world origin): x, y in {-6, +6}, z in {0, 12}. Anchors 1-4 on the floor, 5-8 directly above them.
+rate_hz: 10.0
+noise_stddev_m: 0.05
+global_bias_m: 0.0
+delay_s: 0.0
+ideal_mode: false           # true: exact ranges, no noise/bias
+seed: 42
+tag_frame: uwb_tag_link
+anchors:
+  - {id: 1, name: uwb_anchor_1, x: -6.0, y: -6.0, z: 0.0,  bias_m: 0.0}
+  - {id: 2, name: uwb_anchor_2, x:  6.0, y: -6.0, z: 0.0,  bias_m: 0.0}
+  - {id: 3, name: uwb_anchor_3, x:  6.0, y:  6.0, z: 0.0,  bias_m: 0.0}
+  - {id: 4, name: uwb_anchor_4, x: -6.0, y:  6.0, z: 0.0,  bias_m: 0.0}
+  - {id: 5, name: uwb_anchor_5, x: -6.0, y: -6.0, z: 12.0, bias_m: 0.0}
+  - {id: 6, name: uwb_anchor_6, x:  6.0, y: -6.0, z: 12.0, bias_m: 0.0}
+  - {id: 7, name: uwb_anchor_7, x:  6.0, y:  6.0, z: 12.0, bias_m: 0.0}
+  - {id: 8, name: uwb_anchor_8, x: -6.0, y:  6.0, z: 12.0, bias_m: 0.0}
+marker:                      # visual-only cylinder at each anchor
+  radius: 0.05
+  length: 0.10
+  rgba: [1.0, 0.45, 0.0, 1.0]
+multilateration:             # uwb_multilateration_node (Gauss-Newton LS on /uwb/ranges)
+  ranges_topic: /uwb/ranges
+  position_topic: /uwb/position
+  frame_id: world
+  min_anchors: 4
+  max_iterations: 20
+  tolerance_m: 1.0e-6
+  init_xy: [0.0, 0.0]               # track centre, used until the first fix
+  z_prior_m: 1.16                   # initial height guess and mirror-solution tiebreak
+  z_min_m: 0.0                      # reject z < 0 (below the floor)
+  sigma_m: 0.05                     # range sigma used in the covariance (overridden by msg stddev if > 0)
+  huber_threshold_m: 0.0            # 0 = plain least squares
+  use_last_fix_init: true

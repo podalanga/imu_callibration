@@ -1,0 +1,29 @@
+# PX4 x500 (PX4-gazebo-models models/x500 + x500_base). World frame ENU, body FLU.
+# Facts verified from PX4-gazebo-models main (see progress.md section E):
+#   x500_base: model pose z = 0.24, link base_link with identity inertial pose (CoM = base_link origin),
+#   mass 2.0 kg, rotors rotor_0..3, existing sensors imu_sensor/air_pressure/magnetometer/navsat.
+base_model_uri: model://x500        # merged into our model (same pattern as PX4's x500_mono_cam_down)
+model_dir_name: x500_tagcam         # generated model directory name
+model_name: x500_tagcam_0           # instance name in the world (= PX4_GZ_MODEL_NAME)
+base_link: base_link                # CoM link name inside x500_base
+x500:
+  mass_kg: 2.0
+  com_in_model_frame: [0.0, 0.0, 0.24]   # base_link origin in the x500 model frame (x500_base <pose>)
+# Spawn pose of the MODEL ORIGIN (ground contact reference). The CoM starts at spawn.z + 0.24.
+spawn: {x: -5.75, y: 0.0, z: 0.0, yaw: 0.0}
+# Pose of each frame relative to the CoM (base_link origin), xyz [m], rpy [rad] (R = Rz Ry Rx).
+mounts:
+  com:            {xyz: [0.0, 0.0, 0.0],   rpy: [0.0, 0.0, 0.0]}
+  camera:         {xyz: [0.0, 0.0, -0.06], rpy: [0.0, 1.5707963267948966, 1.5707963267948966]}
+  camera_optical: {parent: camera, xyz: [0.0, 0.0, 0.0], rpy: [-1.5707963267948966, 0.0, -1.5707963267948966]}
+  imu_ideal:      {xyz: [0.0, 0.0, 0.0],   rpy: [0.0, 0.0, 0.0]}
+  imu_noisy:      {xyz: [0.0, 0.0, 0.0],   rpy: [0.0, 0.0, 0.0]}
+  uwb_tag:        {xyz: [0.0, 0.0, 0.0],   rpy: [0.0, 0.0, 0.0]}
+# Sensor carrier links added to the model (tiny mass so the x500 CoM is unchanged).
+carrier_link_mass_kg: 0.001
+carrier_link_inertia: 1.0e-07
+odometry:                           # gz OdometryPublisher on the model; xyz_offset moves the reported point to the CoM
+  gz_topic: /model/x500_tagcam_0/odometry
+  publish_frequency: 100
+  odom_frame: world
+  robot_base_frame: base_link
