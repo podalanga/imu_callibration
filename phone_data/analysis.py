@@ -7,10 +7,11 @@ Stages (progress in <run>/progress.json, results in <run>/results.json, report i
   2. data quality: rate, lost samples, timing jitter, disturbances (phone touched / moved), temperature
   3. noise model on the longest undisturbed stretch (nav/noise_model.py), plus repeatability from --extra
   4. measured free drift on undisturbed segments vs the prediction from the noise model
-  5. filter comparison, free inertial vs ZUPT + ZARU (static tests; at most FILTER_MAX_S of data)
+  5. long-run free inertial drift: position, velocity and tilt from the ESKF with no aiding (static tests; at most
+     LONG_MAX_S of data). ZUPT/ZARU is not part of the report; scripts/run_filter.py --ablation still runs it by hand.
   6. report.html
 
-kind: "static" (full), "quick" (no filter run), "turnon" (quality + bias only; combine several with --extra).
+kind: "static" (full), "quick" (no long-run drift), "turnon" (quality + bias only; combine several with --extra).
 """
 import argparse, json, os, sys, time, traceback
 import numpy as np
@@ -22,7 +23,7 @@ from nav.calib import CalibParams
 from phone_data import merge, report
 
 G = 9.80665
-FILTER_MAX_S = 20 * 60        # the Python ESKF runs ~5 s per minute of data per configuration
+LONG_MAX_S = 20 * 60          # the Python ESKF runs ~5 s per minute of data
 T_ALIGN = 10.0
 
 
@@ -170,7 +171,7 @@ def analyse(run_dir, kind="static", extras=(), calib_path=None, out_dir=None):
     out = out_dir or run_dir
     os.makedirs(out, exist_ok=True)
     stages = ["Merging raw streams", "Checking data quality", "Characterising noise", "Measuring drift",
-              "Running the filter", "Writing the report"]
+              "Long-run free inertial drift", "Writing the report"]
     pr = Progress(out, stages)
     plots = os.path.join(out, "plots")
     os.makedirs(plots, exist_ok=True)
@@ -234,9 +235,8 @@ def analyse(run_dir, kind="static", extras=(), calib_path=None, out_dir=None):
         tc = nm.temp_compensate(imu, R["noise"])         # in place: clean is a view of imu, so it is compensated too
         R["temp_compensation"] = tc
         if tc:
-            R["notes"].append(f"Drift and filter use temperature-compensated readings (reference {tc['T_ref']:.1f} °C).")
+            R["notes"].append(f"Drift uses temperature-compensated readings (reference {tc['T_ref']:.1f} °C).")
     if "noise" in R and kind != "turnon":
-        fp = R["noise"]["filter"]
         undisturbed_s = imu.t[-1] * (1 - dist["fraction"])
         seg = 60.0 if undisturbed_s >= 6 * (60.0 + T_ALIGN) else 20.0          # 60 s segments once >= 6 of them fit
         tt, head, pos = nm.drift_segments(imu, T_ALIGN, seg, disturbed=dist["mask"])
@@ -259,18 +259,14 @@ def analyse(run_dir, kind="static", extras=(), calib_path=None, out_dir=None):
     pr.set(4)
     if kind == "static" and clean_s >= 60:
         import run_filter
-        part = sub_imu(clean, 0, int(np.searchsorted(clean.t, FILTER_MAX_S)))
-        if clean_s > FILTER_MAX_S:
-            R["notes"].append(f"Filter comparison uses the first {FILTER_MAX_S / 60:.0f} min of the undisturbed data.")
+        part = sub_imu(clean, 0, int(np.searchsorted(clean.t, LONG_MAX_S)))
+        if clean_s > LONG_MAX_S:
+            R["notes"].append(f"Long-run drift uses the first {LONG_MAX_S / 60:.0f} min of the undisturbed data.")
         base = {}
         if "noise" in R:
-            fp, fs = R["noise"]["filter"], R["noise"]["timing"]["fs"]
-            # ZARU compares single gyro samples with the bias, so its sigma is the per-sample noise N*sqrt(fs);
-            # the MPU6050 default (0.002 rad/s) is below this phone's and would gate correct updates as outliers
-            base = dict(Na=fp["Na"], Ng=fp["Ng"], zaru_sigma=max(0.002, fp["Ng"] * np.sqrt(fs)))
-            base.update({k: fp[k] for k in ("Kba", "Kbg") if k in fp})      # bias random walk, when resolved
-            R["filter_noise"] = base
-        fr = run_filter.run_ablation(part, None, base)
+            fp = R["noise"]["filter"]
+            base = dict(Na=fp["Na"], Ng=fp["Ng"])
+        fr = run_filter.run_ablation(part, None, base, runs=run_filter.ABLATION[:1])     # free inertial only
         run_filter.plot_drift(fr, os.path.join(plots, "filter_drift.png")); R["plots"]["filter_drift"] = "plots/filter_drift.png"
         R["filter"] = {k: {kk: vv for kk, vv in v.items() if not isinstance(vv, np.ndarray)} for k, v in fr.items()}
         R["filter_duration_s"] = float(part.t[-1])

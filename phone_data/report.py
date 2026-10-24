@@ -60,7 +60,7 @@ def conclusions(R):
         terms = d["terms_at_last_m"]
         big = max(terms, key=terms.get)
         out.append(f"The largest predicted position term is {big.replace('_', ' ')} ({_f(terms[big], 2)} m at "
-                   f"{d['checkpoints_s'][-1]:.0f} s): " + ("better gyro bias estimation (longer still periods, ZARU) is the most "
+                   f"{d['checkpoints_s'][-1]:.0f} s): " + ("better gyro bias estimation (longer still periods) is the most "
                    "effective fix." if big == "tilt_from_gyro" else "accelerometer bias estimation matters most here."))
         if t == 30.0:
             out.append(f"Free inertial integration {'meets' if mp <= 1.0 else 'misses'} the Tier 1 limit of 1 m at 30 s "
@@ -69,11 +69,11 @@ def conclusions(R):
         if np.isfinite(ratio):
             out.append(f"The noise model {'explains' if 0.5 <= ratio <= 2 else 'does not fully explain'} the measured heading "
                        f"drift (measured / predicted = {_f(ratio, 2)}).")
-    f = R.get("filter")
-    if f and "ZUPT + ZARU" in f and "free inertial" in f:
-        z, fi = f["ZUPT + ZARU"], f["free inertial"]
-        out.append(f"Over {R['filter_duration_s'] / 60:.1f} min, stationary aiding (ZUPT + ZARU) keeps the position error at "
-                   f"{_f(z['final_p_m'] * 100, 1)} cm, against {_f(fi['final_p_m'], 1)} m for free inertial integration.")
+    fi = (R.get("filter") or {}).get("free inertial")
+    if fi:
+        out.append(f"Left to integrate freely for {R['filter_duration_s'] / 60:.1f} min, the IMU alone reaches "
+                   f"{_f(fi['final_p_m'], 1)} m of position error, {_f(fi['final_v_mps'], 2)} m/s of velocity error and "
+                   f"{_f(fi['final_tilt_deg'], 2)}° of tilt: without aiding the solution is unusable after seconds.")
     jit = np.max(np.abs(R.get("jitter_heading_error_deg", [0])))
     out.append(f"Assuming a fixed sample interval instead of hardware timestamps would add only {_f(jit, 4)}° of heading "
                "error over the run: timing jitter is negligible.")
@@ -126,7 +126,7 @@ def render(R, run_dir):
             s.append(f"<p>…and {len(ev) - 25} more.</p>")
     if R.get("clean_stretch_s"):
         a, b = R["clean_stretch_s"]
-        s.append(f"<p>Noise model and filter use the longest undisturbed stretch: {a / 60:.1f} to {b / 60:.1f} min. "
+        s.append(f"<p>Noise model and long-run drift use the longest undisturbed stretch: {a / 60:.1f} to {b / 60:.1f} min. "
                  "Drift segments skip any disturbed time.</p>")
     s.append('<div class="grid">' + _img(run_dir, P.get("stillness", ""), "Stillness over the run: 1 s gyro spread, disturbed periods in red")
              + _img(run_dir, P.get("dt_hist", ""), "Sample interval distribution from hardware timestamps") + "</div></section>")
@@ -173,19 +173,17 @@ def render(R, run_dir):
                  f"accelerometer bias {_f(tm['accel_bias'], 3)} m, tilt from gyro bias {_f(tm['tilt_from_gyro'], 3)} m.</p>")
         s.append(_img(run_dir, P.get("free_drift", ""), "Free inertial drift: grey = segments, blue = measured RMS, red dashed = prediction") + "</section>")
 
-    f = R.get("filter")
-    if f:
-        s.append(f"<section><h2>4. Filter: free inertial against stationary aiding</h2><p>15-state error-state Kalman filter over "
-                 f"{R['filter_duration_s'] / 60:.1f} min of undisturbed data. ZUPT = zero-velocity update and ZARU = zero angular-rate update, "
-                 "applied while the stillness detector fires. Truth is zero motion, so any estimated motion is drift.</p>")
-        s.append(_table(["Configuration", "Final position error", "Max position error", "Final |v| [mm/s]", "Final tilt [°]", "Rejected updates"],
-                        [[html.escape(k), _f(v["final_p_m"], 3) + " m", _f(v["max_p_m"], 3) + " m", _f(v["final_v_mps"] * 1e3, 2),
-                          _f(v["final_tilt_deg"], 3), html.escape(", ".join(f"{a}: {b}" for a, b in v.get("rejected", {}).items()) or "–")]
-                         for k, v in f.items()]))
-        s.append(_img(run_dir, P.get("filter_drift", ""), "Position, velocity and tilt drift for each configuration") + "</section>")
+    fi = (R.get("filter") or {}).get("free inertial")
+    if fi:
+        s.append(f"<section><h2>4. Long-run free inertial drift</h2><p>15-state error-state Kalman filter with no aiding over "
+                 f"{R['filter_duration_s'] / 60:.1f} min of undisturbed data, starting from a 10 s alignment. Truth is zero motion "
+                 "and constant attitude, so any estimated motion is drift.</p>")
+        s.append(_table(["Final position error", "Max position error", "Final |v| [m/s]", "Final tilt [°]"],
+                        [[_f(fi["final_p_m"], 3) + " m", _f(fi["max_p_m"], 3) + " m", _f(fi["final_v_mps"], 3), _f(fi["final_tilt_deg"], 3)]]))
+        s.append(_img(run_dir, P.get("filter_drift", ""), "Position, velocity and tilt drift with no aiding") + "</section>")
 
     s.append("<section><h2>Files</h2><p>In this run folder: raw_acc.csv, raw_gyro.csv (every event with its hardware timestamp), "
-             "imu.csv (merged, raw sensor frame, SI units), battery.csv, phone_noise.yaml (noise model for the filter and "
+             "imu.csv (merged, raw sensor frame, SI units), battery.csv, phone_noise.yaml (noise model for the "
              "simulator), results.json (every number in this report).</p></section>")
 
     return f"""<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">

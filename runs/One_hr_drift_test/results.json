@@ -460,26 +460,7 @@
    "final_p_m": 75165.843273625,
    "max_p_m": 75165.843273625,
    "final_v_mps": 239.19744762854165,
-   "final_tilt_deg": 6.110470688689439,
-   "rejected": {
-    "zupt": 0,
-    "zaru": 0
-   },
-   "nis": {}
-  },
-  "ZUPT + ZARU": {
-   "final_p_m": 0.0010851655860333925,
-   "max_p_m": 0.001727719272842996,
-   "final_v_mps": 0.0010325183213272925,
-   "final_tilt_deg": 0.7468973710162883,
-   "rejected": {
-    "zupt": 0,
-    "zaru": 80
-   },
-   "nis": {
-    "zupt": 0.04339296409208594,
-    "zaru": 1.8035018230514124
-   }
+   "final_tilt_deg": 6.110470688689439
   }
  },
  "filter_duration_s": 1140.99929,
@@ -488,10 +469,10 @@
   "Gyro white noise N = 5.05, 4.92, 4.84 m\u00b0/s/\u221aHz (x, y, z); bias instability B = 15.1, 15.8, 3.1 \u00b0/h.",
   "Accelerometer white noise N = 114, 121, 112 \u00b5g/\u221aHz.",
   "Without aiding, after 30 s the heading drifts 0.072\u00b0 (predicted 0.059\u00b0) and the position 7.46 m (predicted 5.00 m), over 45 undisturbed segments.",
-  "The largest predicted position term is tilt from gyro (4.98 m at 30 s): better gyro bias estimation (longer still periods, ZARU) is the most effective fix.",
+  "The largest predicted position term is tilt from gyro (4.98 m at 30 s): better gyro bias estimation (longer still periods) is the most effective fix.",
   "Free inertial integration misses the Tier 1 limit of 1 m at 30 s on this phone; aiding is required for Tier 2.",
   "The noise model explains the measured heading drift (measured / predicted = 1.22).",
-  "Over 19.0 min, stationary aiding (ZUPT + ZARU) keeps the position error at 0.1 cm, against 75165.8 m for free inertial integration.",
+  "Left to integrate freely for 19.0 min, the IMU alone reaches 75165.8 m of position error, 239.20 m/s of velocity error and 6.11\u00b0 of tilt: without aiding the solution is unusable after seconds.",
   "Assuming a fixed sample interval instead of hardware timestamps would add only 0.1555\u00b0 of heading error over the run: timing jitter is negligible."
  ]
 }

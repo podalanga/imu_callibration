@@ -143,7 +143,7 @@ const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).
 const fmt = (v, d = 1) => (v === null || v === undefined || !isFinite(v)) ? '–' : Number(v).toFixed(d);
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 let S = null, view = 'home', paused = false, kind = 'static', ws = null, lastRec = null, raceOn = false;
-const TYPES = { static: ['Static drift', 'Phone untouched, ≥ 60 min. Full noise model, drift and filter analysis.', 120],
+const TYPES = { static: ['Static drift', 'Phone untouched, ≥ 60 min. Full noise model and drift analysis.', 120],
                 turnon: ['Turn-on repeatability', 'Restart the Sensor Server app first. 5 min each, repeat 3×.', 5],
                 quick: ['Quick check', '1 min: is the stream and the setup healthy?', 1] };
 
