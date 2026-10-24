@@ -1,0 +1,323 @@
+{
+ "run": "quick_2026-10-24_2017",
+ "source": "quick_2026-10-24_2017",
+ "kind": "quick",
+ "meta": {
+  "model": "CPH2661",
+  "android": "16",
+  "serial": "808ac3d4",
+  "kind": "quick",
+  "planned_minutes": 1.0,
+  "note": "",
+  "started": "2026-10-24 20:22:54",
+  "checks": {
+   "conn": {
+    "adb": "device",
+    "forward": true,
+    "stream": "live",
+    "model": "CPH2661",
+    "plugged": true,
+    "stay_awake": true,
+    "foreground": true,
+    "temp_c": 36.4,
+    "android": "16",
+    "serial": "808ac3d4"
+   },
+   "still": {
+    "still": true,
+    "flat": true,
+    "gyro_dps": 0.15492196566719804,
+    "acc_std": 0.041341402488069535,
+    "tilt_deg": 1.508926253847963
+   }
+  },
+  "url": "ws://localhost:8080/sensors/connect?types=%5B%22android.sensor.accelerometer_uncalibrated%22%2C%20%22android.sensor.gyroscope_uncalibrated%22%2C%20%22android.sensor.magnetic_field_uncalibrated%22%5D",
+  "ended": "2026-10-24 20:23:55",
+  "stop_reason": "duration reached",
+  "recorded_s": 60.469000000011874,
+  "live_disturbance": {
+   "fraction": 0.0,
+   "disturbed_s": 0,
+   "events": [],
+   "n_events": 0,
+   "validity": "valid"
+  }
+ },
+ "extras": [],
+ "calibrated": false,
+ "calib": null,
+ "plots": {
+  "dt_hist": "plots/dt_hist.png",
+  "stillness": "plots/stillness.png",
+  "allan": "plots/allan.png",
+  "free_drift": "plots/free_drift.png"
+ },
+ "notes": [],
+ "acquisition": {
+  "acc": {
+   "n": 23943,
+   "duration_s": 60.609762322,
+   "rate_hz": 395.0209973411137,
+   "dt_median_ms": 2.531511,
+   "dt_std_us": 3.055373817902179,
+   "dt_min_ms": 2.452448,
+   "dt_max_ms": 2.5490109999999997,
+   "gaps": 0,
+   "missing_samples": 0
+  },
+  "gyro": {
+   "n": 23943,
+   "duration_s": 60.609762322,
+   "rate_hz": 395.0209973411137,
+   "dt_median_ms": 2.531511,
+   "dt_std_us": 3.055373817902179,
+   "dt_min_ms": 2.452448,
+   "dt_max_ms": 2.5490109999999997,
+   "gaps": 0,
+   "missing_samples": 0
+  },
+  "dropped_duplicates": {
+   "acc": 0,
+   "gyro": 0
+  },
+  "out_of_order": {
+   "acc": 0,
+   "gyro": 0
+  },
+  "same_clock": true
+ },
+ "disturbances": {
+  "validity": "valid",
+  "fraction": 0.0,
+  "events": []
+ },
+ "checks": [
+  {
+   "level": "pass",
+   "label": "Sample rate",
+   "value": "395.0 Hz",
+   "note": ""
+  },
+  {
+   "level": "pass",
+   "label": "Lost samples",
+   "value": "0 (0.000 %)",
+   "note": ""
+  },
+  {
+   "level": "pass",
+   "label": "Timing jitter",
+   "value": "3.1 \u00b5s std",
+   "note": ""
+  },
+  {
+   "level": "pass",
+   "label": "Stillness",
+   "value": "valid, 0.00 % disturbed",
+   "note": ""
+  },
+  {
+   "level": "pass",
+   "label": "Duration",
+   "value": "1.0 min",
+   "note": ""
+  },
+  {
+   "level": "info",
+   "label": "Battery temperature",
+   "value": "36.4 to 36.4 \u00b0C",
+   "note": ""
+  }
+ ],
+ "duration_s": 60.609761999999996,
+ "jitter_heading_error_deg": [
+  0.0027784097099912515,
+  -0.0033567937368348903,
+  0.0017267748273562889
+ ],
+ "clean_stretch_s": [
+  0.0,
+  60.609761999999996
+ ],
+ "noise": {
+  "sessions": 1,
+  "duration_s": 60.609761999999996,
+  "timing": {
+   "fs": 394.94470774168155,
+   "dt_std_us": 3.0924348067523746,
+   "gaps": 0
+  },
+  "gyro": {
+   "x": {
+    "mean": 0.004198332374918766,
+    "std": 0.001590040841242252,
+    "N": 9.290450948643159e-05,
+    "B": 5.3382493121071264e-05,
+    "K": 2.150706328192652e-05,
+    "tau_B": 5.261495999989805,
+    "lsb": 0.00106526324,
+    "temp_slope": null
+   },
+   "y": {
+    "mean": -0.0051999341190193385,
+    "std": 0.0015890127274448024,
+    "N": 9.083255449288063e-05,
+    "B": 1.2980634361788913e-06,
+    "K": 1.558642477116841e-05,
+    "tau_B": 5.261495999989805,
+    "lsb": 0.0010652629999999997,
+    "temp_slope": null
+   },
+   "z": {
+    "mean": 0.0025670682752286676,
+    "std": 0.0015092860134443679,
+    "N": 8.435109536562453e-05,
+    "B": 1.9520682438629847e-05,
+    "K": 2.8857345254765917e-05,
+    "tau_B": 5.0628490444116725,
+    "lsb": 0.0010652634550000002,
+    "temp_slope": null
+   }
+  },
+  "acc": {
+   "x": {
+    "mean": 0.2293095467339097,
+    "std": 0.021360336948047016,
+    "N": 0.001122957399943351,
+    "B": 0.00036851564347011544,
+    "K": 0.0003030887302706705,
+    "tau_B": 5.261495999989805,
+    "lsb": 0.0047856199999999904,
+    "temp_slope": null
+   },
+   "y": {
+    "mean": -0.11807562359507999,
+    "std": 0.022888976856269682,
+    "N": 0.0012030955472800864,
+    "B": 0.0,
+    "K": 0.00010332853692921888,
+    "tau_B": 5.261495999989805,
+    "lsb": 0.00478563999999998,
+    "temp_slope": null
+   },
+   "z": {
+    "mean": 9.845380978344402,
+    "std": 0.02234860246154106,
+    "N": 0.0012100852044312378,
+    "B": 0.0,
+    "K": 0.0005283030239746077,
+    "tau_B": 3.9672857440676204,
+    "lsb": 0.004785000000000039,
+    "temp_slope": null
+   }
+  },
+  "temp_c": [
+   36.4,
+   36.4
+  ],
+  "filter": {
+   "Na": 0.001178712717218225,
+   "Ng": 8.936271978164558e-05,
+   "B_acc": 0.00012283854782337182,
+   "B_gyro": 2.473374633196e-05,
+   "K_acc": 0.000311573430391499,
+   "K_gyro": 2.1983611102620282e-05,
+   "duration_s": 60.609761999999996
+  },
+  "error_model": {
+   "fs": 394.94470774168155,
+   "jitter_us": 3.0924348067523746,
+   "Na": [
+    0.001122957399943351,
+    0.0012030955472800864,
+    0.0012100852044312378
+   ],
+   "Ng": [
+    9.290450948643159e-05,
+    9.083255449288063e-05,
+    8.435109536562453e-05
+   ],
+   "Ka_rw": [
+    0.0003030887302706705,
+    0.00010332853692921888,
+    0.0005283030239746077
+   ],
+   "Kg_rw": [
+    2.150706328192652e-05,
+    1.558642477116841e-05,
+    2.8857345254765917e-05
+   ],
+   "B_acc": [
+    0.00039594561045980047,
+    0.0,
+    0.0
+   ],
+   "tau_acc": [
+    2.7838603174549235,
+    2.7838603174549235,
+    2.0990929862791647
+   ],
+   "B_gyro": [
+    5.7355947301604085e-05,
+    1.3946830446970614e-06,
+    2.097367821885149e-05
+   ],
+   "tau_gyro": [
+    2.7838603174549235,
+    2.7838603174549235,
+    2.6787561081543245
+   ],
+   "bg": [
+    0.004198332374918766,
+    -0.0051999341190193385,
+    0.0025670682752286676
+   ],
+   "bias_repeat_acc": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "bias_repeat_gyro": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "lsb_acc": 0.0047856199999999904,
+   "lsb_gyro": 0.00106526324
+  }
+ },
+ "extra_means": {},
+ "drift": {
+  "segment_s": 20.0,
+  "segments": 2,
+  "checkpoints_s": [
+   10.0
+  ],
+  "measured_heading_deg": [
+   0.015452156205674757
+  ],
+  "predicted_heading_deg": [
+   0.024340083273727182
+  ],
+  "measured_position_m": [
+   0.21866158814173287
+  ],
+  "predicted_position_m": [
+   0.1185866234840699
+  ],
+  "terms_at_last_m": {
+   "accel_white": 0.030056302500521687,
+   "accel_bias": 0.03189771531693034,
+   "tilt_from_gyro": 0.11019047920265054
+  }
+ },
+ "conclusions": [
+  "Data quality: all checks passed.",
+  "Gyro white noise N = 5.32, 5.20, 4.83 m\u00b0/s/\u221aHz (x, y, z); bias instability B = 11.0, 0.3, 4.0 \u00b0/h.",
+  "Accelerometer white noise N = 115, 123, 123 \u00b5g/\u221aHz.",
+  "Without aiding, after 10 s the heading drifts 0.015\u00b0 (predicted 0.024\u00b0) and the position 0.22 m (predicted 0.12 m), over 2 undisturbed segments.",
+  "The largest predicted position term is tilt from gyro (0.11 m at 10 s): better gyro bias estimation (longer still periods, ZARU) is the most effective fix.",
+  "The noise model explains the measured heading drift (measured / predicted = 0.63).",
+  "Assuming a fixed sample interval instead of hardware timestamps would add only 0.0034\u00b0 of heading error over the run: timing jitter is negligible."
+ ]
+}

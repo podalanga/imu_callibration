@@ -1,0 +1,7 @@
+kind: combined
+main: console_test_quick
+extras:
+- test_60s
+- test_wrapper
+started: '2026-10-24 18:45:02'
+note: console_test_quick + test_60s, test_wrapper

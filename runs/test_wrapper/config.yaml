@@ -1,0 +1,47 @@
+model: CPH2661
+android: '16'
+serial: 808ac3d4
+note: ''
+started: '2026-10-24 16:36:47'
+url: ws://localhost:8080/sensors/connect?types=%5B%22android.sensor.accelerometer_uncalibrated%22%2C%20%22android.sensor.gyroscope_uncalibrated%22%5D
+source: phone (SensorServer, uncalibrated accel + gyro)
+frame: 'Android device frame: x right, y toward top edge, z out of the screen'
+units: gyro rad/s, acc m/s^2, temp_c = battery temperature
+rate_hz: 395.05
+acquisition:
+  acc:
+    n: 5652
+    duration_s: 14.304653229000001
+    rate_hz: 395.04549738993444
+    dt_median_ms: 2.531354
+    dt_std_us: 4.502550821065026
+    dt_min_ms: 2.455
+    dt_max_ms: 2.555833
+    gaps: 0
+    missing_samples: 0
+  gyro:
+    n: 5638
+    duration_s: 14.269121666
+    rate_hz: 395.04549738993444
+    dt_median_ms: 2.531354
+    dt_std_us: 4.464502812134256
+    dt_min_ms: 2.455
+    dt_max_ms: 2.549166
+    gaps: 0
+    missing_samples: 0
+  dropped_duplicates:
+    acc: 0
+    gyro: 0
+  out_of_order:
+    acc: 0
+    gyro: 0
+  same_clock: false
+android_bias_estimate:
+  acc:
+  - 0.0
+  - 0.0
+  - 0.0
+  gyro:
+  - 0.0037357932999999227
+  - -0.006334529000000085
+  - 0.0014289452999998761

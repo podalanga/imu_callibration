@@ -1,6 +1,8 @@
 __pycache__/
 *.pyc
 .venv/
-data/
-runs/
-results/
+
+# large CSVs, committed as .csv.gz (scripts/pack_for_git.py)
+runs/One_hr_drift_test/imu.csv
+runs/One_hr_drift_test/raw_acc.csv
+runs/One_hr_drift_test/raw_gyro.csv

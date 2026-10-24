@@ -1,0 +1,101 @@
+model: CPH2661
+android: '16'
+serial: 808ac3d4
+kind: quick
+planned_minutes: 1.0
+note: console end-to-end test
+started: '2026-10-24 18:42:45'
+checks:
+  conn:
+    adb: device
+    forward: true
+    stream: live
+    model: CPH2661
+    plugged: true
+    stay_awake: false
+    foreground: false
+    temp_c: 34.3
+    android: '16'
+    serial: 808ac3d4
+  still:
+    still: true
+    flat: true
+    gyro_dps: 0.16459707080720454
+    acc_std: 0.04379649545356536
+    tilt_deg: 1.8229551197285154
+url: ws://localhost:8080/sensors/connect?types=%5B%22android.sensor.accelerometer_uncalibrated%22%2C%20%22android.sensor.gyroscope_uncalibrated%22%2C%20%22android.sensor.magnetic_field_uncalibrated%22%5D
+ended: '2026-10-24 18:43:46'
+stop_reason: duration reached
+recorded_s: 60.375
+live_disturbance:
+  fraction: 0.35
+  disturbed_s: 21
+  events:
+  - end_w: 14
+    start_s: 2.0
+    end_s: 14.0
+    peak_dps: 0.8762936289319375
+    tilt_deg: 0.024334634675861944
+  - end_w: 27
+    start_s: 21.0
+    end_s: 27.0
+    peak_dps: 0.561755304475455
+    tilt_deg: 0.014665177834174713
+  - end_w: 33
+    start_s: 32.0
+    end_s: 33.0
+    peak_dps: 0.6708461776858634
+    tilt_deg: 0.01015008785412752
+  - end_w: 48
+    start_s: 47.0
+    end_s: 48.0
+    peak_dps: 0.6253395689081325
+    tilt_deg: 0.016265276319401577
+  - end_w: 55
+    start_s: 54.0
+    end_s: 55.0
+    peak_dps: 0.9867860960961984
+    tilt_deg: 0.004208492103638616
+  n_events: 5
+  validity: invalid
+source: phone (SensorServer, uncalibrated accel + gyro)
+frame: 'Android device frame: x right, y toward top edge, z out of the screen'
+units: gyro rad/s, acc m/s^2, temp_c = battery temperature
+rate_hz: 395.05
+acquisition:
+  acc:
+    n: 23933
+    duration_s: 60.578610343
+    rate_hz: 395.05361272578307
+    dt_median_ms: 2.5313019999999997
+    dt_std_us: 2.5658191912881847
+    dt_min_ms: 2.4526559999999997
+    dt_max_ms: 2.549792
+    gaps: 0
+    missing_samples: 0
+  gyro:
+    n: 23933
+    duration_s: 60.578610343
+    rate_hz: 395.05361272578307
+    dt_median_ms: 2.5313019999999997
+    dt_std_us: 2.5658191912881847
+    dt_min_ms: 2.4526559999999997
+    dt_max_ms: 2.549792
+    gaps: 0
+    missing_samples: 0
+  dropped_duplicates:
+    acc: 0
+    gyro: 0
+  out_of_order:
+    acc: 0
+    gyro: 0
+  same_clock: true
+android_bias_estimate:
+  acc:
+  - 0.0
+  - 0.0
+  - 0.0
+  gyro:
+  - 0.0035361034127849725
+  - -0.0066607870394619125
+  - 0.0014694031268334038

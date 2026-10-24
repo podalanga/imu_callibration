@@ -42,7 +42,16 @@ class Dataset:
     config: dict = field(default_factory=dict)
 
 
+def csv_path(path):
+    """path, or path + ".gz" when only the compressed copy exists (large recordings are stored gzipped so
+    they fit GitHub's 100 MB file limit; np.loadtxt reads .gz directly)."""
+    if not os.path.exists(path) and os.path.exists(path + ".gz"):
+        return path + ".gz"
+    return path
+
+
 def _load(path, cols):
+    path = csv_path(path)
     if not os.path.exists(path):
         return None
     a = np.loadtxt(path, delimiter=",", skiprows=1, ndmin=2)

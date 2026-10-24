@@ -1,0 +1,35 @@
+model: CPH2661
+android: '16'
+serial: 808ac3d4
+kind: quick
+planned_minutes: 1.0
+note: ''
+started: '2026-10-24 20:22:54'
+checks:
+  conn:
+    adb: device
+    forward: true
+    stream: live
+    model: CPH2661
+    plugged: true
+    stay_awake: true
+    foreground: true
+    temp_c: 36.4
+    android: '16'
+    serial: 808ac3d4
+  still:
+    still: true
+    flat: true
+    gyro_dps: 0.15492196566719804
+    acc_std: 0.041341402488069535
+    tilt_deg: 1.508926253847963
+url: ws://localhost:8080/sensors/connect?types=%5B%22android.sensor.accelerometer_uncalibrated%22%2C%20%22android.sensor.gyroscope_uncalibrated%22%2C%20%22android.sensor.magnetic_field_uncalibrated%22%5D
+ended: '2026-10-24 20:23:55'
+stop_reason: duration reached
+recorded_s: 60.469000000011874
+live_disturbance:
+  fraction: 0.0
+  disturbed_s: 0
+  events: []
+  n_events: 0
+  validity: valid

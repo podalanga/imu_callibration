@@ -1,0 +1,497 @@
+{
+ "run": "One_hr_drift_test",
+ "source": "One_hr_drift_test",
+ "kind": "static",
+ "meta": {
+  "model": "CPH2661",
+  "android": "16",
+  "serial": "808ac3d4",
+  "kind": "static",
+  "planned_minutes": 60.0,
+  "note": "on the table",
+  "started": "2026-10-24 21:01:01",
+  "checks": {
+   "conn": {
+    "adb": "device",
+    "forward": true,
+    "stream": "live",
+    "model": "CPH2661",
+    "plugged": true,
+    "stay_awake": true,
+    "foreground": true,
+    "temp_c": 33.1,
+    "android": "16",
+    "serial": "808ac3d4"
+   },
+   "still": {
+    "still": true,
+    "flat": true,
+    "gyro_dps": 0.16000781621444596,
+    "acc_std": 0.036414782965630284,
+    "tilt_deg": 1.4747450168215461
+   }
+  },
+  "url": "ws://localhost:8080/sensors/connect?types=%5B%22android.sensor.accelerometer_uncalibrated%22%2C%20%22android.sensor.gyroscope_uncalibrated%22%2C%20%22android.sensor.magnetic_field_uncalibrated%22%5D",
+  "ended": "2026-10-24 22:01:01",
+  "stop_reason": "duration reached",
+  "recorded_s": 3600.0780000000086,
+  "live_disturbance": {
+   "fraction": 0.006944444444444444,
+   "disturbed_s": 25,
+   "events": [
+    {
+     "end_w": 254,
+     "start_s": 250.0,
+     "end_s": 254.0,
+     "peak_dps": 5.3263879723963115,
+     "tilt_deg": 0.2422642708820342
+    },
+    {
+     "end_w": 1398,
+     "start_s": 1395.0,
+     "end_s": 1398.0,
+     "peak_dps": 1.2305607131356724,
+     "tilt_deg": 0.12924094307773434
+    },
+    {
+     "end_w": 1981,
+     "start_s": 1979.0,
+     "end_s": 1981.0,
+     "peak_dps": 0.42901717323648797,
+     "tilt_deg": 0.06632783169087189
+    },
+    {
+     "end_w": 1991,
+     "start_s": 1986.0,
+     "end_s": 1991.0,
+     "peak_dps": 3.6068309218968553,
+     "tilt_deg": 0.23522670648022
+    },
+    {
+     "end_w": 2008,
+     "start_s": 2007.0,
+     "end_s": 2008.0,
+     "peak_dps": 0.6677529369890741,
+     "tilt_deg": 0.09303407014065879
+    },
+    {
+     "end_w": 2011,
+     "start_s": 2009.0,
+     "end_s": 2011.0,
+     "peak_dps": 0.6978097698569545,
+     "tilt_deg": 0.053624888197887834
+    },
+    {
+     "end_w": 2032,
+     "start_s": 2029.0,
+     "end_s": 2032.0,
+     "peak_dps": 0.6039949617480206,
+     "tilt_deg": 0.05199528303565932
+    },
+    {
+     "end_w": 2080,
+     "start_s": 2079.0,
+     "end_s": 2080.0,
+     "peak_dps": 1.5369547956020455,
+     "tilt_deg": 0.07013858239065945
+    },
+    {
+     "end_w": 2616,
+     "start_s": 2614.0,
+     "end_s": 2616.0,
+     "peak_dps": 0.4536281480138587,
+     "tilt_deg": 0.06643371227200201
+    },
+    {
+     "end_w": 3327,
+     "start_s": 3325.0,
+     "end_s": 3327.0,
+     "peak_dps": 6.71720825503216,
+     "tilt_deg": 0.2842040045541876
+    }
+   ],
+   "n_events": 10,
+   "validity": "partly valid"
+  }
+ },
+ "extras": [],
+ "calibrated": false,
+ "calib": null,
+ "plots": {
+  "dt_hist": "plots/dt_hist.png",
+  "stillness": "plots/stillness.png",
+  "allan": "plots/allan.png",
+  "bias_vs_time": "plots/bias_vs_time.png",
+  "free_drift": "plots/free_drift.png",
+  "filter_drift": "plots/filter_drift.png"
+ },
+ "notes": [],
+ "acquisition": {
+  "acc": {
+   "n": 1422283,
+   "duration_s": 3600.2530012810003,
+   "rate_hz": 395.04549738993444,
+   "dt_median_ms": 2.531354,
+   "dt_std_us": 3.0309625913210216,
+   "dt_min_ms": 2.4499999999999997,
+   "dt_max_ms": 2.55,
+   "gaps": 0,
+   "missing_samples": 0
+  },
+  "gyro": {
+   "n": 1422283,
+   "duration_s": 3600.2530012810003,
+   "rate_hz": 395.04549738993444,
+   "dt_median_ms": 2.531354,
+   "dt_std_us": 3.0309667714085657,
+   "dt_min_ms": 2.4499999999999997,
+   "dt_max_ms": 2.55,
+   "gaps": 0,
+   "missing_samples": 0
+  },
+  "dropped_duplicates": {
+   "acc": 0,
+   "gyro": 0
+  },
+  "out_of_order": {
+   "acc": 0,
+   "gyro": 0
+  },
+  "same_clock": false
+ },
+ "disturbances": {
+  "validity": "partly valid",
+  "fraction": 0.0069430626675563165,
+  "events": [
+   [
+    250.0,
+    254.0,
+    5.3256999020707125,
+    0.24280601554157655
+   ],
+   [
+    1395.0,
+    1398.0,
+    1.240548333245103,
+    0.1418940401710671
+   ],
+   [
+    1979.0,
+    1981.0,
+    0.4288556370758651,
+    0.043473689824330586
+   ],
+   [
+    1986.0,
+    1991.0,
+    3.6033958756709747,
+    0.25342049081372003
+   ],
+   [
+    2007.0,
+    2008.0,
+    0.6667936283181204,
+    0.06286111422304869
+   ],
+   [
+    2009.0,
+    2011.0,
+    0.6981601897639583,
+    0.03238856576064857
+   ],
+   [
+    2029.0,
+    2032.0,
+    0.6027535758113823,
+    0.049916188509812796
+   ],
+   [
+    2079.0,
+    2080.0,
+    1.5367768968862483,
+    0.07420113302923792
+   ],
+   [
+    2614.0,
+    2616.0,
+    0.4538095933723396,
+    0.05342291364811422
+   ],
+   [
+    3325.0,
+    3327.0,
+    6.717179012229511,
+    0.2550693609345327
+   ]
+  ]
+ },
+ "checks": [
+  {
+   "level": "pass",
+   "label": "Sample rate",
+   "value": "395.0 Hz",
+   "note": ""
+  },
+  {
+   "level": "pass",
+   "label": "Lost samples",
+   "value": "0 (0.000 %)",
+   "note": ""
+  },
+  {
+   "level": "pass",
+   "label": "Timing jitter",
+   "value": "3.0 \u00b5s std",
+   "note": ""
+  },
+  {
+   "level": "warn",
+   "label": "Stillness",
+   "value": "partly valid, 0.69 % disturbed",
+   "note": "10 disturbance(s); the analysis uses undisturbed data only."
+  },
+  {
+   "level": "pass",
+   "label": "Duration",
+   "value": "60.0 min",
+   "note": ""
+  },
+  {
+   "level": "info",
+   "label": "Battery temperature",
+   "value": "33.1 to 35.6 \u00b0C",
+   "note": ""
+  }
+ ],
+ "duration_s": 3600.253002,
+ "jitter_heading_error_deg": [
+  -0.09788272249369775,
+  0.1555465003874945,
+  -0.05514496861816409
+ ],
+ "clean_stretch_s": [
+  254.000171,
+  1394.9994609999999
+ ],
+ "noise": {
+  "sessions": 1,
+  "duration_s": 1140.99929,
+  "timing": {
+   "fs": 395.10075069068887,
+   "dt_std_us": 2.894242942571695,
+   "gaps": 0
+  },
+  "gyro": {
+   "x": {
+    "mean": 0.0035125217418647443,
+    "std": 0.00158555157033942,
+    "N": 8.817253059458689e-05,
+    "B": 7.297334914837894e-05,
+    "K": NaN,
+    "tau_B": 107.24859400020017,
+    "lsb": 0.001065263225,
+    "temp_slope": null
+   },
+   "y": {
+    "mean": -0.006135742197139549,
+    "std": 0.0015922934934858616,
+    "N": 8.585732277481436e-05,
+    "B": 7.663637664977112e-05,
+    "K": NaN,
+    "tau_B": 107.24859400020017,
+    "lsb": 0.001065262999999999,
+    "temp_slope": null
+   },
+   "z": {
+    "mean": 0.0015477138683519715,
+    "std": 0.0014971205112007916,
+    "N": 8.445789406568754e-05,
+    "B": 1.5229855054321304e-05,
+    "K": NaN,
+    "tau_B": 107.24859400020017,
+    "lsb": 0.0010652633650000004,
+    "temp_slope": null
+   }
+  },
+  "acc": {
+   "x": {
+    "mean": 0.22563842576537968,
+    "std": 0.021590804721196784,
+    "N": 0.0011166653419374317,
+    "B": 0.0007090990935379128,
+    "K": 2.0827348748581763e-05,
+    "tau_B": 92.86448940932094,
+    "lsb": 3.269000000014066e-06,
+    "temp_slope": null
+   },
+   "y": {
+    "mean": -0.11155308765543547,
+    "std": 0.021778732964590895,
+    "N": 0.001188562505444705,
+    "B": 0.0006387657628355012,
+    "K": NaN,
+    "tau_B": 107.24859400020017,
+    "lsb": 9.446600000045934e-07,
+    "temp_slope": null
+   },
+   "z": {
+    "mean": 9.82865124712821,
+    "std": 0.022694968540166307,
+    "N": 0.0010967541351394883,
+    "B": 0.0014310746813181081,
+    "K": NaN,
+    "tau_B": 107.24859400020017,
+    "lsb": 6.240000006485502e-07,
+    "temp_slope": null
+   }
+  },
+  "temp_c": [
+   33.1,
+   33.3
+  ],
+  "filter": {
+   "Na": 0.001133993994173875,
+   "Ng": 8.616258247836294e-05,
+   "B_acc": 0.0009263131792305073,
+   "B_gyro": 5.4946526950823795e-05,
+   "K_acc": 2.0827348748581763e-05,
+   "K_gyro": NaN,
+   "duration_s": 1140.99929
+  },
+  "error_model": {
+   "fs": 395.10075069068887,
+   "jitter_us": 2.894242942571695,
+   "Na": [
+    0.0011166653419374317,
+    0.001188562505444705,
+    0.0010967541351394883
+   ],
+   "Ng": [
+    8.817253059458689e-05,
+    8.585732277481436e-05,
+    8.445789406568754e-05
+   ],
+   "Ka_rw": [
+    2.0827348748581763e-05,
+    0.0,
+    0.0
+   ],
+   "Kg_rw": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "B_acc": [
+    0.0007618799322154921,
+    0.0006863114345028687,
+    0.0015375948032285175
+   ],
+   "tau_acc": [
+    49.1346504811222,
+    56.74528783079375,
+    56.74528783079375
+   ],
+   "B_gyro": [
+    7.840502238596056e-05,
+    8.234070241981882e-05,
+    1.6363468860953635e-05
+   ],
+   "tau_gyro": [
+    56.74528783079375,
+    56.74528783079375,
+    56.74528783079375
+   ],
+   "bg": [
+    0.0035125217418647443,
+    -0.006135742197139549,
+    0.0015477138683519715
+   ],
+   "bias_repeat_acc": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "bias_repeat_gyro": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "lsb_acc": 9.446600000045934e-07,
+   "lsb_gyro": 0.001065263225
+  }
+ },
+ "extra_means": {},
+ "drift": {
+  "segment_s": 60.0,
+  "segments": 45,
+  "checkpoints_s": [
+   10.0,
+   20.0,
+   30.0
+  ],
+  "measured_heading_deg": [
+   0.026220767581660497,
+   0.045812433314419566,
+   0.07192305051368736
+  ],
+  "predicted_heading_deg": [
+   0.02333543555308608,
+   0.04134970689843645,
+   0.05912499674516456
+  ],
+  "measured_position_m": [
+   0.2587259037328639,
+   2.119039132087461,
+   7.455407857774117
+  ],
+  "predicted_position_m": [
+   0.19443769661312552,
+   1.4928685781473907,
+   5.003085269934972
+  ],
+  "terms_at_last_m": {
+   "accel_white": 0.15473166715826744,
+   "accel_bias": 0.48823488276640803,
+   "tilt_from_gyro": 4.976800882963753
+  }
+ },
+ "filter": {
+  "free inertial": {
+   "final_p_m": 75165.843273625,
+   "max_p_m": 75165.843273625,
+   "final_v_mps": 239.19744762854165,
+   "final_tilt_deg": 6.110470688689439,
+   "rejected": {
+    "zupt": 0,
+    "zaru": 0
+   },
+   "nis": {}
+  },
+  "ZUPT + ZARU": {
+   "final_p_m": 0.0010851655860333925,
+   "max_p_m": 0.001727719272842996,
+   "final_v_mps": 0.0010325183213272925,
+   "final_tilt_deg": 0.7468973710162883,
+   "rejected": {
+    "zupt": 0,
+    "zaru": 80
+   },
+   "nis": {
+    "zupt": 0.04339296409208594,
+    "zaru": 1.8035018230514124
+   }
+  }
+ },
+ "filter_duration_s": 1140.99929,
+ "conclusions": [
+  "Data quality: stillness warn (partly valid, 0.69 % disturbed).",
+  "Gyro white noise N = 5.05, 4.92, 4.84 m\u00b0/s/\u221aHz (x, y, z); bias instability B = 15.1, 15.8, 3.1 \u00b0/h.",
+  "Accelerometer white noise N = 114, 121, 112 \u00b5g/\u221aHz.",
+  "Without aiding, after 30 s the heading drifts 0.072\u00b0 (predicted 0.059\u00b0) and the position 7.46 m (predicted 5.00 m), over 45 undisturbed segments.",
+  "The largest predicted position term is tilt from gyro (4.98 m at 30 s): better gyro bias estimation (longer still periods, ZARU) is the most effective fix.",
+  "Free inertial integration misses the Tier 1 limit of 1 m at 30 s on this phone; aiding is required for Tier 2.",
+  "The noise model explains the measured heading drift (measured / predicted = 1.22).",
+  "Over 19.0 min, stationary aiding (ZUPT + ZARU) keeps the position error at 0.1 cm, against 75165.8 m for free inertial integration.",
+  "Assuming a fixed sample interval instead of hardware timestamps would add only 0.1555\u00b0 of heading error over the run: timing jitter is negligible."
+ ]
+}

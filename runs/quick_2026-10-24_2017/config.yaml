@@ -1,0 +1,76 @@
+model: CPH2661
+android: '16'
+serial: 808ac3d4
+kind: quick
+planned_minutes: 1.0
+note: ''
+started: '2026-10-24 20:22:54'
+checks:
+  conn:
+    adb: device
+    forward: true
+    stream: live
+    model: CPH2661
+    plugged: true
+    stay_awake: true
+    foreground: true
+    temp_c: 36.4
+    android: '16'
+    serial: 808ac3d4
+  still:
+    still: true
+    flat: true
+    gyro_dps: 0.15492196566719804
+    acc_std: 0.041341402488069535
+    tilt_deg: 1.508926253847963
+url: ws://localhost:8080/sensors/connect?types=%5B%22android.sensor.accelerometer_uncalibrated%22%2C%20%22android.sensor.gyroscope_uncalibrated%22%2C%20%22android.sensor.magnetic_field_uncalibrated%22%5D
+ended: '2026-10-24 20:23:55'
+stop_reason: duration reached
+recorded_s: 60.469000000011874
+live_disturbance:
+  fraction: 0.0
+  disturbed_s: 0
+  events: []
+  n_events: 0
+  validity: valid
+source: phone (SensorServer, uncalibrated accel + gyro)
+frame: 'Android device frame: x right, y toward top edge, z out of the screen'
+units: gyro rad/s, acc m/s^2, temp_c = battery temperature
+rate_hz: 395.02
+acquisition:
+  acc:
+    n: 23943
+    duration_s: 60.609762322
+    rate_hz: 395.0209973411137
+    dt_median_ms: 2.531511
+    dt_std_us: 3.055373817902179
+    dt_min_ms: 2.452448
+    dt_max_ms: 2.5490109999999997
+    gaps: 0
+    missing_samples: 0
+  gyro:
+    n: 23943
+    duration_s: 60.609762322
+    rate_hz: 395.0209973411137
+    dt_median_ms: 2.531511
+    dt_std_us: 3.055373817902179
+    dt_min_ms: 2.452448
+    dt_max_ms: 2.5490109999999997
+    gaps: 0
+    missing_samples: 0
+  dropped_duplicates:
+    acc: 0
+    gyro: 0
+  out_of_order:
+    acc: 0
+    gyro: 0
+  same_clock: true
+android_bias_estimate:
+  acc:
+  - 0.0
+  - 0.0
+  - 0.0
+  gyro:
+  - 0.004267212354098014
+  - -0.005235402140797282
+  - 0.002576629066588267

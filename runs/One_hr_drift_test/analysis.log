@@ -1,0 +1,9 @@
+[1/6] Merging raw streams 
+[2/6] Checking data quality 
+[3/6] Characterising noise 
+[4/6] Measuring drift 
+[5/6] Running the filter 
+free inertial    final drift 7516584.33 cm  (max 7516584.33 cm)  final |v| 239197.45 mm/s  final tilt  6.110 deg | gated: {'zupt': 0, 'zaru': 0} | mean NIS: {}
+ZUPT + ZARU      final drift    0.11 cm  (max    0.17 cm)  final |v|    1.03 mm/s  final tilt  0.747 deg | gated: {'zupt': 0, 'zaru': 80} | mean NIS: {'zupt': 0.04, 'zaru': 1.8}
+[6/6] Writing the report 
+[6/6] Writing the report done

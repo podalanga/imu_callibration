@@ -1,0 +1,391 @@
+{
+ "run": "combined_2026-10-24_184502",
+ "source": "console_test_quick",
+ "kind": "turnon",
+ "meta": {
+  "model": "CPH2661",
+  "android": "16",
+  "serial": "808ac3d4",
+  "kind": "quick",
+  "planned_minutes": 1.0,
+  "note": "console end-to-end test",
+  "started": "2026-10-24 18:42:45",
+  "checks": {
+   "conn": {
+    "adb": "device",
+    "forward": true,
+    "stream": "live",
+    "model": "CPH2661",
+    "plugged": true,
+    "stay_awake": false,
+    "foreground": false,
+    "temp_c": 34.3,
+    "android": "16",
+    "serial": "808ac3d4"
+   },
+   "still": {
+    "still": true,
+    "flat": true,
+    "gyro_dps": 0.16459707080720454,
+    "acc_std": 0.04379649545356536,
+    "tilt_deg": 1.8229551197285154
+   }
+  },
+  "url": "ws://localhost:8080/sensors/connect?types=%5B%22android.sensor.accelerometer_uncalibrated%22%2C%20%22android.sensor.gyroscope_uncalibrated%22%2C%20%22android.sensor.magnetic_field_uncalibrated%22%5D",
+  "ended": "2026-10-24 18:43:46",
+  "stop_reason": "duration reached",
+  "recorded_s": 60.375,
+  "live_disturbance": {
+   "fraction": 0.35,
+   "disturbed_s": 21,
+   "events": [
+    {
+     "end_w": 14,
+     "start_s": 2.0,
+     "end_s": 14.0,
+     "peak_dps": 0.8762936289319375,
+     "tilt_deg": 0.024334634675861944
+    },
+    {
+     "end_w": 27,
+     "start_s": 21.0,
+     "end_s": 27.0,
+     "peak_dps": 0.561755304475455,
+     "tilt_deg": 0.014665177834174713
+    },
+    {
+     "end_w": 33,
+     "start_s": 32.0,
+     "end_s": 33.0,
+     "peak_dps": 0.6708461776858634,
+     "tilt_deg": 0.01015008785412752
+    },
+    {
+     "end_w": 48,
+     "start_s": 47.0,
+     "end_s": 48.0,
+     "peak_dps": 0.6253395689081325,
+     "tilt_deg": 0.016265276319401577
+    },
+    {
+     "end_w": 55,
+     "start_s": 54.0,
+     "end_s": 55.0,
+     "peak_dps": 0.9867860960961984,
+     "tilt_deg": 0.004208492103638616
+    }
+   ],
+   "n_events": 5,
+   "validity": "invalid"
+  }
+ },
+ "extras": [
+  "C:\\Users\\msaip\\OneDrive\\Desktop\\IMU\\imu_callibration\\runs\\test_60s",
+  "C:\\Users\\msaip\\OneDrive\\Desktop\\IMU\\imu_callibration\\runs\\test_wrapper"
+ ],
+ "calibrated": false,
+ "calib": null,
+ "plots": {
+  "dt_hist": "plots/dt_hist.png",
+  "stillness": "plots/stillness.png",
+  "allan": "plots/allan.png"
+ },
+ "notes": [],
+ "acquisition": {
+  "acc": {
+   "n": 23933,
+   "duration_s": 60.578610343,
+   "rate_hz": 395.05361272578307,
+   "dt_median_ms": 2.5313019999999997,
+   "dt_std_us": 2.5658191912881847,
+   "dt_min_ms": 2.4526559999999997,
+   "dt_max_ms": 2.549792,
+   "gaps": 0,
+   "missing_samples": 0
+  },
+  "gyro": {
+   "n": 23933,
+   "duration_s": 60.578610343,
+   "rate_hz": 395.05361272578307,
+   "dt_median_ms": 2.5313019999999997,
+   "dt_std_us": 2.5658191912881847,
+   "dt_min_ms": 2.4526559999999997,
+   "dt_max_ms": 2.549792,
+   "gaps": 0,
+   "missing_samples": 0
+  },
+  "dropped_duplicates": {
+   "acc": 0,
+   "gyro": 0
+  },
+  "out_of_order": {
+   "acc": 0,
+   "gyro": 0
+  },
+  "same_clock": true
+ },
+ "disturbances": {
+  "validity": "partly valid",
+  "fraction": 0.049513224418167384,
+  "events": [
+   [
+    5.0,
+    6.0,
+    0.8888653663801461,
+    0.01430758590169322
+   ],
+   [
+    12.0,
+    13.0,
+    0.7145660937531608,
+    0.0081397677129018
+   ],
+   [
+    54.0,
+    55.0,
+    0.9867722317311581,
+    0.004841198925588883
+   ]
+  ]
+ },
+ "checks": [
+  {
+   "level": "pass",
+   "label": "Sample rate",
+   "value": "395.1 Hz",
+   "note": ""
+  },
+  {
+   "level": "pass",
+   "label": "Lost samples",
+   "value": "0 (0.000 %)",
+   "note": ""
+  },
+  {
+   "level": "pass",
+   "label": "Timing jitter",
+   "value": "2.6 \u00b5s std",
+   "note": ""
+  },
+  {
+   "level": "warn",
+   "label": "Stillness",
+   "value": "partly valid, 4.95 % disturbed",
+   "note": "3 disturbance(s); the analysis uses undisturbed data only."
+  },
+  {
+   "level": "warn",
+   "label": "Duration",
+   "value": "1.0 min",
+   "note": "Bias instability and random walk need at least 3 min."
+  },
+  {
+   "level": "info",
+   "label": "Battery temperature",
+   "value": "34.3 to 34.3 \u00b0C",
+   "note": ""
+  }
+ ],
+ "duration_s": 60.57861,
+ "jitter_heading_error_deg": [
+  -0.0014629810589326293,
+  0.00268192850521208,
+  -0.0005296321701173809
+ ],
+ "clean_stretch_s": [
+  13.000665999999999,
+  53.999776999999995
+ ],
+ "noise": {
+  "sessions": 3,
+  "duration_s": 59.268440999999996,
+  "timing": {
+   "fs": 395.1007506912435,
+   "dt_std_us": 2.580309088057686,
+   "gaps": 0
+  },
+  "gyro": {
+   "x": {
+    "mean": 0.0037151603716648164,
+    "std": 0.008859129173885559,
+    "N": 0.000122492368692207,
+    "B": 0.0003719508654177217,
+    "K": NaN,
+    "tau_B": 5.16577100000239,
+    "lsb": 0.0010652599999999984,
+    "temp_slope": null
+   },
+   "y": {
+    "mean": -0.005755433265949432,
+    "std": 0.00306615120855397,
+    "N": 0.00013409704708260958,
+    "B": 0.00011735501475812103,
+    "K": NaN,
+    "tau_B": 5.16577100000239,
+    "lsb": 0.0010652630000000003,
+    "temp_slope": null
+   },
+   "z": {
+    "mean": 0.0021698138372537794,
+    "std": 0.0016463435741909814,
+    "N": 8.501676934214317e-05,
+    "B": 0.0,
+    "K": 0.0001224329418414043,
+    "tau_B": 1.2027266663795706,
+    "lsb": 0.0010652634550000002,
+    "temp_slope": null
+   }
+  },
+  "acc": {
+   "x": {
+    "mean": 0.24840718706488427,
+    "std": 0.04892944582005976,
+    "N": 0.0014259873367041436,
+    "B": 0.0028915923923498767,
+    "K": NaN,
+    "tau_B": 5.16577100000239,
+    "lsb": 0.0047856199999999904,
+    "temp_slope": null
+   },
+   "y": {
+    "mean": 0.003465832049073204,
+    "std": 0.02859474534696546,
+    "N": 0.0013955802625715608,
+    "B": 0.0004142392576175417,
+    "K": 0.0014410484350788131,
+    "tau_B": 1.6774008853366933,
+    "lsb": 0.00478563999999998,
+    "temp_slope": null
+   },
+   "z": {
+    "mean": 9.840760931130948,
+    "std": 0.08389280492689802,
+    "N": 0.002187812731916385,
+    "B": 0.0,
+    "K": 0.002216564459450324,
+    "tau_B": 1.709583853052017,
+    "lsb": 0.004785000000000039,
+    "temp_slope": null
+   }
+  },
+  "repeatability": {
+   "gyro": [
+    0.00010477109914515056,
+    0.00046191344436334554,
+    0.0003830563531778341
+   ],
+   "acc": [
+    0.09792891904151861,
+    0.15546845807250875,
+    0.009479896727754004
+   ]
+  },
+  "temp_c": [
+   36.9,
+   36.9
+  ],
+  "filter": {
+   "Na": 0.0016697934437306964,
+   "Ng": 0.00011386872837231992,
+   "B_acc": 0.0011019438833224729,
+   "B_gyro": 0.00016310196005861425,
+   "K_acc": 0.0018288064472645686,
+   "K_gyro": 0.0001224329418414043,
+   "duration_s": 59.268440999999996
+  },
+  "error_model": {
+   "fs": 395.1007506912435,
+   "jitter_us": 2.580309088057686,
+   "Na": [
+    0.0014259873367041436,
+    0.0013955802625715608,
+    0.002187812731916385
+   ],
+   "Ng": [
+    0.000122492368692207,
+    0.00013409704708260958,
+    8.501676934214317e-05
+   ],
+   "Ka_rw": [
+    0.0,
+    0.0014410484350788131,
+    0.002216564459450324
+   ],
+   "Kg_rw": [
+    0.0,
+    0.0,
+    0.0001224329418414043
+   ],
+   "B_acc": [
+    0.0031068241885442043,
+    0.00044507260041755294,
+    0.0
+   ],
+   "tau_acc": [
+    2.7332121693134344,
+    0.8875136959453405,
+    0.9045417211915435
+   ],
+   "B_gyro": [
+    0.0003996365285394292,
+    0.0001260901776689197,
+    0.0
+   ],
+   "tau_gyro": [
+    2.7332121693134344,
+    2.7332121693134344,
+    0.6363633155447465
+   ],
+   "bg": [
+    0.0037151603716648164,
+    -0.005755433265949432,
+    0.0021698138372537794
+   ],
+   "bias_repeat_acc": [
+    0.09792891904151861,
+    0.15546845807250875,
+    0.009479896727754004
+   ],
+   "bias_repeat_gyro": [
+    0.00010477109914515056,
+    0.00046191344436334554,
+    0.0003830563531778341
+   ],
+   "lsb_acc": 0.0047856199999999904,
+   "lsb_gyro": 0.0010652630000000003
+  }
+ },
+ "extra_means": {
+  "test_60s": {
+   "gyro": [
+    0.003715160371664917,
+    -0.0057554332659500535,
+    0.002169813837253673
+   ],
+   "acc": [
+    0.2484071870648807,
+    0.003465832049073059,
+    9.840760931130887
+   ]
+  },
+  "test_wrapper": {
+   "gyro": [
+    0.003575965470537522,
+    -0.006405022808575535,
+    0.0015403991915061528
+   ],
+   "acc": [
+    0.3377916795600453,
+    0.265405185121516,
+    9.822922403051274
+   ]
+  }
+ },
+ "conclusions": [
+  "Data quality: stillness warn (partly valid, 4.95 % disturbed); duration warn (1.0 min).",
+  "Gyro white noise N = 7.02, 7.68, 4.87 m\u00b0/s/\u221aHz (x, y, z); bias instability B = 76.7, 24.2, 0.0 \u00b0/h.",
+  "Accelerometer white noise N = 145, 142, 223 \u00b5g/\u221aHz.",
+  "Gyro turn-on bias changes by 0.026 \u00b0/s (1\u03c3, worst axis) between starts, so the bias must be re-estimated at every start.",
+  "Assuming a fixed sample interval instead of hardware timestamps would add only 0.0027\u00b0 of heading error over the run: timing jitter is negligible."
+ ]
+}

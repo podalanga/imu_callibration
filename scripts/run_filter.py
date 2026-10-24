@@ -47,38 +47,50 @@ def plot_drift(results, path):
     fig.tight_layout(); fig.savefig(path, dpi=110); plt.close(fig)
 
 
-ap = argparse.ArgumentParser()
-ap.add_argument("dataset")
-ap.add_argument("--calib", default=None)
-ap.add_argument("--noise", default=None, help="noise.yaml from run_allan.py")
-ap.add_argument("--config", default="{}", help="JSON overrides of NavConfig")
-ap.add_argument("--ablation", action="store_true")
-ap.add_argument("--est", default=None)
-ap.add_argument("--plots", default=None)
-a = ap.parse_args()
+def run_ablation(imu, calib=None, base=None, runs=ABLATION, est_path=None):
+    """Run each configuration over imu; returns {name: metrics + "rejected" + "nis"}."""
+    results = {}
+    for name, kw in runs:
+        cfg = runner.NavConfig(**{**(base or {}), **kw})
+        r = runner.run(imu, cfg, calib=calib)
+        m = drift_metrics(r["est"], r["est"][0, 7:11])      # reference = attitude right after alignment
+        m["rejected"] = r["rejected"]
+        m["nis"] = {k: float(v.mean()) for k, v in r["nis"].items() if len(v)}
+        results[name] = m
+        print(summary_line(name, m), "| gated:", r["rejected"], "| mean NIS:", {k: round(v, 2) for k, v in m["nis"].items()})
+        if est_path:
+            io.save_est(est_path, r["est"])
+    return results
 
-ds = io.load(a.dataset)
-cp = CalibParams.from_yaml(a.calib) if a.calib else None
-base = json.loads(a.config)
-if a.noise:
-    with open(a.noise) as f:
-        n = yaml.safe_load(f)
-    base.update(Na=n["Na"], Ng=n["Ng"])
-runs = ABLATION if a.ablation else [("configured", {})]
-results = {}
-for name, kw in runs:
-    cfg = runner.NavConfig(**{**base, **kw})
-    r = runner.run(ds.imu, cfg, calib=cp)
-    m = drift_metrics(r["est"], r["est"][0, 7:11])      # reference = attitude right after alignment
-    results[name] = m
-    print(summary_line(name, m), "| gated:", r["rejected"],
-          "| mean NIS:", {k: round(float(v.mean()), 2) for k, v in r["nis"].items() if len(v)})
-    if a.est and not a.ablation:
-        io.save_est(a.est, r["est"])
-if a.plots and results:
-    os.makedirs(a.plots, exist_ok=True)
-    plot_drift(results, os.path.join(a.plots, "drift.png"))
-    with open(os.path.join(a.plots, "metrics.json"), "w") as f:
-        json.dump({k: {kk: vv for kk, vv in v.items() if not isinstance(vv, np.ndarray)} for k, v in results.items()},
-                  f, indent=1, default=float)
-    print("plots in", a.plots)
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("dataset")
+    ap.add_argument("--calib", default=None)
+    ap.add_argument("--noise", default=None, help="noise.yaml from run_allan.py")
+    ap.add_argument("--config", default="{}", help="JSON overrides of NavConfig")
+    ap.add_argument("--ablation", action="store_true")
+    ap.add_argument("--est", default=None)
+    ap.add_argument("--plots", default=None)
+    a = ap.parse_args()
+
+    ds = io.load(a.dataset)
+    cp = CalibParams.from_yaml(a.calib) if a.calib else None
+    base = json.loads(a.config)
+    if a.noise:
+        with open(a.noise) as f:
+            n = yaml.safe_load(f)
+        base.update({k: n[k] for k in ("Na", "Ng", "Kba", "Kbg") if k in n})   # Kba/Kbg only when K was resolved
+    results = run_ablation(ds.imu, cp, base, ABLATION if a.ablation else [("configured", {})],
+                           None if a.ablation else a.est)
+    if a.plots and results:
+        os.makedirs(a.plots, exist_ok=True)
+        plot_drift(results, os.path.join(a.plots, "drift.png"))
+        with open(os.path.join(a.plots, "metrics.json"), "w") as f:
+            json.dump({k: {kk: vv for kk, vv in v.items() if not isinstance(vv, np.ndarray)} for k, v in results.items()},
+                      f, indent=1, default=float)
+        print("plots in", a.plots)
+
+
+if __name__ == "__main__":
+    main()

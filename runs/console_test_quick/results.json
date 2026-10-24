@@ -1,0 +1,353 @@
+{
+ "run": "console_test_quick",
+ "source": "console_test_quick",
+ "kind": "quick",
+ "meta": {
+  "model": "CPH2661",
+  "android": "16",
+  "serial": "808ac3d4",
+  "kind": "quick",
+  "planned_minutes": 1.0,
+  "note": "console end-to-end test",
+  "started": "2026-10-24 18:42:45",
+  "checks": {
+   "conn": {
+    "adb": "device",
+    "forward": true,
+    "stream": "live",
+    "model": "CPH2661",
+    "plugged": true,
+    "stay_awake": false,
+    "foreground": false,
+    "temp_c": 34.3,
+    "android": "16",
+    "serial": "808ac3d4"
+   },
+   "still": {
+    "still": true,
+    "flat": true,
+    "gyro_dps": 0.16459707080720454,
+    "acc_std": 0.04379649545356536,
+    "tilt_deg": 1.8229551197285154
+   }
+  },
+  "url": "ws://localhost:8080/sensors/connect?types=%5B%22android.sensor.accelerometer_uncalibrated%22%2C%20%22android.sensor.gyroscope_uncalibrated%22%2C%20%22android.sensor.magnetic_field_uncalibrated%22%5D",
+  "ended": "2026-10-24 18:43:46",
+  "stop_reason": "duration reached",
+  "recorded_s": 60.375,
+  "live_disturbance": {
+   "fraction": 0.35,
+   "disturbed_s": 21,
+   "events": [
+    {
+     "end_w": 14,
+     "start_s": 2.0,
+     "end_s": 14.0,
+     "peak_dps": 0.8762936289319375,
+     "tilt_deg": 0.024334634675861944
+    },
+    {
+     "end_w": 27,
+     "start_s": 21.0,
+     "end_s": 27.0,
+     "peak_dps": 0.561755304475455,
+     "tilt_deg": 0.014665177834174713
+    },
+    {
+     "end_w": 33,
+     "start_s": 32.0,
+     "end_s": 33.0,
+     "peak_dps": 0.6708461776858634,
+     "tilt_deg": 0.01015008785412752
+    },
+    {
+     "end_w": 48,
+     "start_s": 47.0,
+     "end_s": 48.0,
+     "peak_dps": 0.6253395689081325,
+     "tilt_deg": 0.016265276319401577
+    },
+    {
+     "end_w": 55,
+     "start_s": 54.0,
+     "end_s": 55.0,
+     "peak_dps": 0.9867860960961984,
+     "tilt_deg": 0.004208492103638616
+    }
+   ],
+   "n_events": 5,
+   "validity": "invalid"
+  }
+ },
+ "extras": [],
+ "calibrated": false,
+ "calib": null,
+ "plots": {
+  "dt_hist": "plots/dt_hist.png",
+  "stillness": "plots/stillness.png",
+  "allan": "plots/allan.png"
+ },
+ "notes": [
+  "Not enough undisturbed data for a 30 s drift segment."
+ ],
+ "acquisition": {
+  "acc": {
+   "n": 23933,
+   "duration_s": 60.578610343,
+   "rate_hz": 395.05361272578307,
+   "dt_median_ms": 2.5313019999999997,
+   "dt_std_us": 2.5658191912881847,
+   "dt_min_ms": 2.4526559999999997,
+   "dt_max_ms": 2.549792,
+   "gaps": 0,
+   "missing_samples": 0
+  },
+  "gyro": {
+   "n": 23933,
+   "duration_s": 60.578610343,
+   "rate_hz": 395.05361272578307,
+   "dt_median_ms": 2.5313019999999997,
+   "dt_std_us": 2.5658191912881847,
+   "dt_min_ms": 2.4526559999999997,
+   "dt_max_ms": 2.549792,
+   "gaps": 0,
+   "missing_samples": 0
+  },
+  "dropped_duplicates": {
+   "acc": 0,
+   "gyro": 0
+  },
+  "out_of_order": {
+   "acc": 0,
+   "gyro": 0
+  },
+  "same_clock": true
+ },
+ "disturbances": {
+  "validity": "partly valid",
+  "fraction": 0.049513224418167384,
+  "events": [
+   [
+    5.0,
+    6.0,
+    0.8888653663801461,
+    0.01430758590169322
+   ],
+   [
+    12.0,
+    13.0,
+    0.7145660937531608,
+    0.0081397677129018
+   ],
+   [
+    54.0,
+    55.0,
+    0.9867722317311581,
+    0.004841198925588883
+   ]
+  ]
+ },
+ "checks": [
+  {
+   "level": "pass",
+   "label": "Sample rate",
+   "value": "395.1 Hz",
+   "note": ""
+  },
+  {
+   "level": "pass",
+   "label": "Lost samples",
+   "value": "0 (0.000 %)",
+   "note": ""
+  },
+  {
+   "level": "pass",
+   "label": "Timing jitter",
+   "value": "2.6 \u00b5s std",
+   "note": ""
+  },
+  {
+   "level": "warn",
+   "label": "Stillness",
+   "value": "partly valid, 4.95 % disturbed",
+   "note": "3 disturbance(s); the analysis uses undisturbed data only."
+  },
+  {
+   "level": "pass",
+   "label": "Duration",
+   "value": "1.0 min",
+   "note": ""
+  },
+  {
+   "level": "info",
+   "label": "Battery temperature",
+   "value": "34.3 to 34.3 \u00b0C",
+   "note": ""
+  }
+ ],
+ "duration_s": 60.57861,
+ "jitter_heading_error_deg": [
+  -0.0014629810589326293,
+  0.00268192850521208,
+  -0.0005296321701173809
+ ],
+ "clean_stretch_s": [
+  13.000665999999999,
+  53.999776999999995
+ ],
+ "noise": {
+  "sessions": 1,
+  "duration_s": 40.999111,
+  "timing": {
+   "fs": 395.1007506912435,
+   "dt_std_us": 2.580309088057686,
+   "gaps": 0
+  },
+  "gyro": {
+   "x": {
+    "mean": 0.0035099180381405115,
+    "std": 0.00286226317601684,
+    "N": 0.00010305338781219675,
+    "B": 0.0,
+    "K": NaN,
+    "tau_B": 3.826872000001771,
+    "lsb": 0.001065262999999997,
+    "temp_slope": null
+   },
+   "y": {
+    "mean": -0.006649101625887147,
+    "std": 0.0031559379632564474,
+    "N": 0.0001028619380363313,
+    "B": 0.0,
+    "K": 2.8525975328887273e-05,
+    "tau_B": 3.826872000001771,
+    "lsb": 0.0010652625500000013,
+    "temp_slope": null
+   },
+   "z": {
+    "mean": 0.0014768547306185948,
+    "std": 0.0015137415647923673,
+    "N": 8.747840412824406e-05,
+    "B": 2.228476948574441e-05,
+    "K": NaN,
+    "tau_B": 3.826872000001771,
+    "lsb": 0.0010652634500000003,
+    "temp_slope": null
+   }
+  },
+  "acc": {
+   "x": {
+    "mean": 0.14217551562557723,
+    "std": 0.029820239007127217,
+    "N": 0.001441648936763616,
+    "B": 0.0,
+    "K": NaN,
+    "tau_B": 3.826872000001771,
+    "lsb": 0.004785625999999987,
+    "temp_slope": null
+   },
+   "y": {
+    "mean": 0.27952911923138657,
+    "std": 0.021872113412038933,
+    "N": 0.0011188615040464657,
+    "B": 0.0,
+    "K": 0.00043826265352913307,
+    "tau_B": 3.826872000001771,
+    "lsb": 0.0047856199999999904,
+    "temp_slope": null
+   },
+   "z": {
+    "mean": 9.826278797968886,
+    "std": 0.06214378844280108,
+    "N": 0.0016924735081356192,
+    "B": 0.0,
+    "K": 0.0008853601865430488,
+    "tau_B": 3.3110254460405355,
+    "lsb": 0.004785000000000039,
+    "temp_slope": null
+   }
+  },
+  "temp_c": [
+   34.3,
+   34.3
+  ],
+  "filter": {
+   "Na": 0.0014176613163152335,
+   "Ng": 9.779790999225737e-05,
+   "B_acc": 0.0,
+   "B_gyro": 7.4282564952481365e-06,
+   "K_acc": 0.000661811420036091,
+   "K_gyro": 2.8525975328887273e-05,
+   "duration_s": 40.999111
+  },
+  "error_model": {
+   "fs": 395.1007506912435,
+   "jitter_us": 2.580309088057686,
+   "Na": [
+    0.001441648936763616,
+    0.0011188615040464657,
+    0.0016924735081356192
+   ],
+   "Ng": [
+    0.00010305338781219675,
+    0.0001028619380363313,
+    8.747840412824406e-05
+   ],
+   "Ka_rw": [
+    0.0,
+    0.00043826265352913307,
+    0.0008853601865430488
+   ],
+   "Kg_rw": [
+    0.0,
+    2.8525975328887273e-05,
+    0.0
+   ],
+   "B_acc": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tau_acc": [
+    2.0248000000009374,
+    2.0248000000009374,
+    1.751865315365363
+   ],
+   "B_gyro": [
+    0.0,
+    0.0,
+    2.394350637303283e-05
+   ],
+   "tau_gyro": [
+    2.0248000000009374,
+    2.0248000000009374,
+    2.0248000000009374
+   ],
+   "bg": [
+    0.0035099180381405115,
+    -0.006649101625887147,
+    0.0014768547306185948
+   ],
+   "bias_repeat_acc": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "bias_repeat_gyro": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "lsb_acc": 0.0047856199999999904,
+   "lsb_gyro": 0.001065262999999997
+  }
+ },
+ "extra_means": {},
+ "conclusions": [
+  "Data quality: stillness warn (partly valid, 4.95 % disturbed).",
+  "Gyro white noise N = 5.90, 5.89, 5.01 m\u00b0/s/\u221aHz (x, y, z); bias instability B = 0.0, 0.0, 4.6 \u00b0/h.",
+  "Accelerometer white noise N = 147, 114, 173 \u00b5g/\u221aHz.",
+  "Assuming a fixed sample interval instead of hardware timestamps would add only 0.0027\u00b0 of heading error over the run: timing jitter is negligible.",
+  "Not enough undisturbed data for a 30 s drift segment."
+ ]
+}

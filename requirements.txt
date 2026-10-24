@@ -1,5 +1,4 @@
-websocket-client>=1.8.0
-ujson>=5.8
+aiohttp>=3.9
 numpy>=1.24
 scipy>=1.10
 pyyaml>=6.0

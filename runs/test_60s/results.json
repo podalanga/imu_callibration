@@ -1,0 +1,277 @@
+{
+ "run": "test_60s",
+ "kind": "static",
+ "meta": {
+  "model": "CPH2661",
+  "android": "16",
+  "serial": "808ac3d4",
+  "note": "first logger test",
+  "started": "2026-10-24 16:22:48",
+  "url": "ws://localhost:8080/sensors/connect?types=%5B%22android.sensor.accelerometer_uncalibrated%22%2C%20%22android.sensor.gyroscope_uncalibrated%22%5D"
+ },
+ "extras": [],
+ "calibrated": false,
+ "calib": null,
+ "plots": {
+  "dt_hist": "plots/dt_hist.png",
+  "stillness": "plots/stillness.png",
+  "allan": "plots/allan.png"
+ },
+ "notes": [
+  "Not enough undisturbed data for a 30 s drift segment."
+ ],
+ "acquisition": {
+  "acc": {
+   "n": 23423,
+   "duration_s": 59.29122430100001,
+   "rate_hz": 395.0372263330235,
+   "dt_median_ms": 2.5314069999999997,
+   "dt_std_us": 6.051610401248987,
+   "dt_min_ms": 2.450157,
+   "dt_max_ms": 2.5593749999999997,
+   "gaps": 0,
+   "missing_samples": 0
+  },
+  "gyro": {
+   "n": 23415,
+   "duration_s": 59.270986541000006,
+   "rate_hz": 395.0372263330235,
+   "dt_median_ms": 2.5314069999999997,
+   "dt_std_us": 6.048055508011679,
+   "dt_min_ms": 2.450157,
+   "dt_max_ms": 2.55,
+   "gaps": 0,
+   "missing_samples": 0
+  },
+  "dropped_duplicates": {
+   "acc": 0,
+   "gyro": 0
+  },
+  "out_of_order": {
+   "acc": 0,
+   "gyro": 0
+  },
+  "same_clock": false
+ },
+ "disturbances": {
+  "validity": "partly valid",
+  "fraction": 0.033740497138464165,
+  "events": [
+   [
+    9.0,
+    10.0,
+    0.640870856109431,
+    0.050109511613411546
+   ],
+   [
+    22.0,
+    23.0,
+    2.2793790230850726,
+    0.007901352036254415
+   ]
+  ]
+ },
+ "checks": [
+  {
+   "level": "pass",
+   "label": "Sample rate",
+   "value": "395.0 Hz",
+   "note": ""
+  },
+  {
+   "level": "pass",
+   "label": "Lost samples",
+   "value": "0 (0.000 %)",
+   "note": ""
+  },
+  {
+   "level": "pass",
+   "label": "Timing jitter",
+   "value": "6.1 \u00b5s std",
+   "note": ""
+  },
+  {
+   "level": "warn",
+   "label": "Stillness",
+   "value": "partly valid, 3.37 % disturbed",
+   "note": "2 disturbance(s); the analysis uses undisturbed data only."
+  },
+  {
+   "level": "fail",
+   "label": "Duration",
+   "value": "1.0 min",
+   "note": "Bias instability and random walk need at least 60 min."
+  },
+  {
+   "level": "info",
+   "label": "Battery temperature",
+   "value": "36.9 to 36.9 \u00b0C",
+   "note": ""
+  }
+ ],
+ "duration_s": 59.268440999999996,
+ "jitter_heading_error_deg": [
+  -0.001781218122080984,
+  0.00327924862650513,
+  -0.0010644828529359238
+ ],
+ "clean_stretch_s": [
+  23.000498999999998,
+  59.268440999999996
+ ],
+ "noise": {
+  "sessions": 1,
+  "duration_s": 36.267942,
+  "timing": {
+   "fs": 395.1007506912435,
+   "dt_std_us": 6.603437131080514,
+   "gaps": 0
+  },
+  "gyro": {
+   "x": {
+    "mean": 0.003992062080336404,
+    "std": 0.0071719924564229275,
+    "N": 0.00011522679341770331,
+    "B": 0.00033583961790514843,
+    "K": NaN,
+    "tau_B": 3.462408000001602,
+    "lsb": 0.0010652623499999973,
+    "temp_slope": null
+   },
+   "y": {
+    "mean": -0.005654343263580402,
+    "std": 0.0022563727107586303,
+    "N": 0.00011764365010868944,
+    "B": 0.0,
+    "K": 6.791146630628568e-05,
+    "tau_B": 3.0004473509246865,
+    "lsb": 0.001065262999999999,
+    "temp_slope": null
+   },
+   "z": {
+    "mean": 0.002585390711687604,
+    "std": 0.001530790652342473,
+    "N": 8.551468648120684e-05,
+    "B": 8.95518759662567e-06,
+    "K": NaN,
+    "tau_B": 3.462408000001602,
+    "lsb": 0.0010652634550000002,
+    "temp_slope": null
+   }
+  },
+  "acc": {
+   "x": {
+    "mean": 0.24985390413456174,
+    "std": 0.029476776064439762,
+    "N": 0.0013701575378409867,
+    "B": 0.0,
+    "K": NaN,
+    "tau_B": 3.462408000001602,
+    "lsb": 0.0047856199999999904,
+    "temp_slope": null
+   },
+   "y": {
+    "mean": 0.00338181596324679,
+    "std": 0.025298829477093183,
+    "N": 0.0012022547770999257,
+    "B": 0.0,
+    "K": NaN,
+    "tau_B": 3.462408000001602,
+    "lsb": 0.004785639999999999,
+    "temp_slope": null
+   },
+   "z": {
+    "mean": 9.843188254396985,
+    "std": 0.06407268085797403,
+    "N": 0.0018191602100901853,
+    "B": 0.001220367716610635,
+    "K": 0.002695532085713285,
+    "tau_B": 1.1689261380652778,
+    "lsb": 0.004785000000000039,
+    "temp_slope": null
+   }
+  },
+  "temp_c": [
+   36.9,
+   36.9
+  ],
+  "filter": {
+   "Na": 0.0014638575083436992,
+   "Ng": 0.00010612837666919984,
+   "B_acc": 0.00040678923887021165,
+   "B_gyro": 0.0001149316018339247,
+   "K_acc": 0.002695532085713285,
+   "K_gyro": 6.791146630628568e-05,
+   "duration_s": 36.267942
+  },
+  "error_model": {
+   "fs": 395.1007506912435,
+   "jitter_us": 6.603437131080514,
+   "Na": [
+    0.0013701575378409867,
+    0.0012022547770999257,
+    0.0018191602100901853
+   ],
+   "Ng": [
+    0.00011522679341770331,
+    0.00011764365010868944,
+    8.551468648120684e-05
+   ],
+   "Ka_rw": [
+    0.0,
+    0.0,
+    0.002695532085713285
+   ],
+   "Kg_rw": [
+    0.0,
+    6.791146630628568e-05,
+    0.0
+   ],
+   "B_acc": [
+    0.0,
+    0.0,
+    0.001311204148591362
+   ],
+   "tau_acc": [
+    1.8319619047627527,
+    1.8319619047627527,
+    0.6184794381297767
+   ],
+   "B_gyro": [
+    0.00036083738881718215,
+    0.0,
+    9.621754958186807e-06
+   ],
+   "tau_gyro": [
+    1.8319619047627527,
+    1.5875382809125327,
+    1.8319619047627527
+   ],
+   "bg": [
+    0.003992062080336404,
+    -0.005654343263580402,
+    0.002585390711687604
+   ],
+   "bias_repeat_acc": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "bias_repeat_gyro": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "lsb_acc": 0.0047856199999999904,
+   "lsb_gyro": 0.001065262999999999
+  }
+ },
+ "extra_means": {},
+ "conclusions": [
+  "Data quality: stillness warn (partly valid, 3.37 % disturbed); duration fail (1.0 min).",
+  "Gyro white noise N = 6.60, 6.74, 4.90 m\u00b0/s/\u221aHz (x, y, z); bias instability B = 69.3, 0.0, 1.8 \u00b0/h.",
+  "Accelerometer white noise N = 140, 123, 186 \u00b5g/\u221aHz.",
+  "Assuming a fixed sample interval instead of hardware timestamps would add only 0.0033\u00b0 of heading error over the run: timing jitter is negligible.",
+  "Not enough undisturbed data for a 30 s drift segment."
+ ]
+}

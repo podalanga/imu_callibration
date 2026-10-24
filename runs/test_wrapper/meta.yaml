@@ -1,0 +1,6 @@
+model: CPH2661
+android: '16'
+serial: 808ac3d4
+note: ''
+started: '2026-10-24 16:36:47'
+url: ws://localhost:8080/sensors/connect?types=%5B%22android.sensor.accelerometer_uncalibrated%22%2C%20%22android.sensor.gyroscope_uncalibrated%22%5D

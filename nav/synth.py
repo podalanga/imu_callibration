@@ -22,6 +22,20 @@ def min_jerk(tau):
     return s, ds, dds
 
 
+def gauss_markov(r, n, dt, sigma, tau):
+    """(n,3) first-order Gauss-Markov bias with stationary std sigma and correlation time tau (per axis)."""
+    from scipy.signal import lfilter
+    sigma, tau = np.broadcast_to(sigma, 3), np.broadcast_to(tau, 3)
+    out = np.zeros((n, 3))
+    for i in range(3):
+        if tau[i] > 0 and sigma[i] > 0:
+            phi = np.exp(-dt / tau[i])
+            w = r.normal(0, sigma[i] * np.sqrt(1 - phi ** 2), n)
+            w[0] = r.normal(0, sigma[i])                     # start in the stationary distribution
+            out[:, i] = lfilter([1.0], [1.0, -phi], w)
+    return out
+
+
 @dataclass
 class ErrorModel:
     """Raw = (T K)^-1 * ideal - b  + noise, then quantised. Defaults ~ MPU6050 datasheet."""
@@ -40,7 +54,33 @@ class ErrorModel:
     lsb_acc: float = G0 / 8192              # +-4 g
     lsb_gyro: float = np.radians(1 / 65.5)  # +-500 dps
     jitter_us: float = 0.0
+    B_acc: float = 0.0                      # bias instability as first-order Gauss-Markov: std (m/s^2)
+    tau_acc: float = 0.0                    #   and correlation time (s); 0 = off
+    B_gyro: float = 0.0                     # same for the gyro (rad/s, s)
+    tau_gyro: float = 0.0
     seed: int = 0
+
+    @staticmethod
+    def from_noise_yaml(path, seed=0, turn_on="measured"):
+        """Error model of a real sensor from scripts/characterise_noise.py output (per-axis values).
+
+        turn_on="measured" uses the gyro bias seen in the static recording; "random" draws a new turn-on
+        bias from the measured repeatability (needs --extra sessions), like a fresh power-up.
+        Scale and misalignment stay identity: calibrate the real sensor for those.
+        """
+        import yaml
+        with open(path) as f:
+            m = yaml.safe_load(f)["error_model"]
+        r = np.random.default_rng(seed + 7)
+        arr = lambda k: np.asarray(m.get(k, 0.0), float)
+        # apply() makes reading = truth - bg, and `bg` in the yaml is the mean static reading, hence the sign
+        bg = -arr("bg") if turn_on == "measured" else r.normal(0, 1, 3) * arr("bias_repeat_gyro")
+        ba = np.zeros(3) if turn_on == "measured" else r.normal(0, 1, 3) * arr("bias_repeat_acc")
+        return ErrorModel(ba=ba, bg=bg, Na=arr("Na"), Ng=arr("Ng"), Ka_rw=arr("Ka_rw"), Kg_rw=arr("Kg_rw"),
+                          B_acc=arr("B_acc"), tau_acc=arr("tau_acc"), B_gyro=arr("B_gyro"), tau_gyro=arr("tau_gyro"),
+                          temp_slope_bg=arr("temp_slope_bg") if "temp_slope_bg" in m else np.zeros(3),
+                          lsb_acc=float(m.get("lsb_acc", 0.0)), lsb_gyro=float(m.get("lsb_gyro", 0.0)),
+                          jitter_us=float(m.get("jitter_us", 0.0)), seed=seed)
 
     @staticmethod
     def random_mpu6050(seed=0, scale=1.0):
@@ -65,6 +105,10 @@ class ErrorModel:
         gyr = (np.linalg.inv(self.Tg @ self.Kg) @ gyro_ideal.T).T - bg
         acc = acc + r.normal(0, self.Na / np.sqrt(dt), (n, 3))
         gyr = gyr + r.normal(0, self.Ng / np.sqrt(dt), (n, 3))
+        if np.any(np.asarray(self.tau_acc) > 0):
+            acc = acc - gauss_markov(r, n, dt, self.B_acc, self.tau_acc)
+        if np.any(np.asarray(self.tau_gyro) > 0):
+            gyr = gyr - gauss_markov(r, n, dt, self.B_gyro, self.tau_gyro)
         if self.lsb_acc:
             acc = np.round(acc / self.lsb_acc) * self.lsb_acc
         if self.lsb_gyro:

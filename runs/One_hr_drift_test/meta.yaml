@@ -1,0 +1,85 @@
+model: CPH2661
+android: '16'
+serial: 808ac3d4
+kind: static
+planned_minutes: 60.0
+note: on the table
+started: '2026-10-24 21:01:01'
+checks:
+  conn:
+    adb: device
+    forward: true
+    stream: live
+    model: CPH2661
+    plugged: true
+    stay_awake: true
+    foreground: true
+    temp_c: 33.1
+    android: '16'
+    serial: 808ac3d4
+  still:
+    still: true
+    flat: true
+    gyro_dps: 0.16000781621444596
+    acc_std: 0.036414782965630284
+    tilt_deg: 1.4747450168215461
+url: ws://localhost:8080/sensors/connect?types=%5B%22android.sensor.accelerometer_uncalibrated%22%2C%20%22android.sensor.gyroscope_uncalibrated%22%2C%20%22android.sensor.magnetic_field_uncalibrated%22%5D
+ended: '2026-10-24 22:01:01'
+stop_reason: duration reached
+recorded_s: 3600.0780000000086
+live_disturbance:
+  fraction: 0.006944444444444444
+  disturbed_s: 25
+  events:
+  - end_w: 254
+    start_s: 250.0
+    end_s: 254.0
+    peak_dps: 5.3263879723963115
+    tilt_deg: 0.2422642708820342
+  - end_w: 1398
+    start_s: 1395.0
+    end_s: 1398.0
+    peak_dps: 1.2305607131356724
+    tilt_deg: 0.12924094307773434
+  - end_w: 1981
+    start_s: 1979.0
+    end_s: 1981.0
+    peak_dps: 0.42901717323648797
+    tilt_deg: 0.06632783169087189
+  - end_w: 1991
+    start_s: 1986.0
+    end_s: 1991.0
+    peak_dps: 3.6068309218968553
+    tilt_deg: 0.23522670648022
+  - end_w: 2008
+    start_s: 2007.0
+    end_s: 2008.0
+    peak_dps: 0.6677529369890741
+    tilt_deg: 0.09303407014065879
+  - end_w: 2011
+    start_s: 2009.0
+    end_s: 2011.0
+    peak_dps: 0.6978097698569545
+    tilt_deg: 0.053624888197887834
+  - end_w: 2032
+    start_s: 2029.0
+    end_s: 2032.0
+    peak_dps: 0.6039949617480206
+    tilt_deg: 0.05199528303565932
+  - end_w: 2080
+    start_s: 2079.0
+    end_s: 2080.0
+    peak_dps: 1.5369547956020455
+    tilt_deg: 0.07013858239065945
+  - end_w: 2616
+    start_s: 2614.0
+    end_s: 2616.0
+    peak_dps: 0.4536281480138587
+    tilt_deg: 0.06643371227200201
+  - end_w: 3327
+    start_s: 3325.0
+    end_s: 3327.0
+    peak_dps: 6.71720825503216
+    tilt_deg: 0.2842040045541876
+  n_events: 10
+  validity: partly valid

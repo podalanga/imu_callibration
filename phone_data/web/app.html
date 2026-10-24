@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IMU Test Console</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uplot@1.6.30/dist/uPlot.min.css">
+<script src="https://cdn.jsdelivr.net/npm/uplot@1.6.30/dist/uPlot.iife.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+  :root { --bg:#f5f6f8; --card:#fff; --ink:#1b2130; --muted:#646e82; --line:#dde1e8; --accent:#2457c5; --ok:#1b7f4b; --bad:#b42318; --warn:#b54708;
+          --x:#d1495b; --y:#2e86ab; --z:#3b9b4b; --env:#7a5195; --c1:#d1495b; --c2:#e09f3e; --c3:#2e86ab; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg:#11141a; --card:#1a1f28; --ink:#e6e9ef; --muted:#9aa3b5; --line:#2b323e; --accent:#6c9cff; } }
+  :root[data-theme="dark"] { --bg:#11141a; --card:#1a1f28; --ink:#e6e9ef; --muted:#9aa3b5; --line:#2b323e; --accent:#6c9cff; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:14px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  header { position:sticky; top:0; z-index:5; background:var(--card); border-bottom:1px solid var(--line); padding:10px 16px; display:flex; flex-wrap:wrap; gap:10px 18px; align-items:center; }
+  header h1 { font-size:16px; margin:0; }
+  nav { display:flex; gap:4px; flex-wrap:wrap; }
+  nav a { padding:6px 12px; border-radius:6px; color:var(--muted); text-decoration:none; font-weight:600; }
+  nav a.on { background:var(--bg); color:var(--ink); }
+  .conn { margin-left:auto; display:flex; flex-wrap:wrap; gap:6px; }
+  .pill { display:inline-flex; align-items:center; gap:6px; padding:3px 10px; border-radius:99px; font-size:12px; font-weight:600; background:var(--bg); border:1px solid var(--line); }
+  .dot { width:8px; height:8px; border-radius:50%; background:var(--muted); } .ok .dot { background:var(--ok); } .bad .dot { background:var(--bad); } .warn .dot { background:var(--warn); }
+  main { padding:16px; max-width:1400px; margin:0 auto; }
+  .view { display:none; } .view.on { display:block; }
+  .grid { display:grid; gap:16px; grid-template-columns:repeat(auto-fit, minmax(min(100%, 460px), 1fr)); }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:14px 16px; min-width:0; }
+  .card h2 { font-size:15px; margin:0 0 4px; } .sub { margin:0 0 10px; color:var(--muted); font-size:13px; }
+  .wide { grid-column:1 / -1; }
+  .big { display:grid; gap:16px; grid-template-columns:repeat(auto-fit, minmax(min(100%, 380px), 1fr)); margin-top:8px; }
+  .mode { cursor:pointer; text-align:left; font:inherit; color:inherit; background:var(--card); border:1px solid var(--line); border-radius:12px; padding:22px; }
+  .mode:hover { border-color:var(--accent); } .mode h2 { font-size:20px; margin:0 0 6px; } .mode p { margin:0; color:var(--muted); }
+  .stats { display:grid; gap:8px; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); }
+  .stat { border:1px solid var(--line); border-radius:8px; padding:8px 10px; } .stat .l { font-size:12px; color:var(--muted); }
+  .stat .v { font-size:22px; font-weight:700; font-variant-numeric:tabular-nums; } .stat.bad .v { color:var(--bad); }
+  button, .btn { font:inherit; font-weight:600; padding:7px 14px; border-radius:7px; border:1px solid var(--line); background:var(--bg); color:var(--ink); cursor:pointer; text-decoration:none; display:inline-block; }
+  button.primary, .btn.primary { background:var(--accent); border-color:var(--accent); color:#fff; } button.danger { background:var(--bad); border-color:var(--bad); color:#fff; }
+  button:disabled { opacity:.45; cursor:not-allowed; }
+  .row { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+  ul.check { list-style:none; padding:0; margin:0; } ul.check li { display:flex; gap:10px; padding:7px 0; border-bottom:1px solid var(--line); align-items:flex-start; }
+  .mark { width:22px; flex:none; text-align:center; font-weight:800; } .mark.ok { color:var(--ok); } .mark.bad { color:var(--bad); } .mark.wait { color:var(--muted); }
+  .hint { color:var(--muted); font-size:12px; display:block; }
+  label.f { display:block; font-size:12px; color:var(--muted); margin:10px 0 4px; }
+  input[type=text], input[type=number] { font:inherit; padding:7px 9px; border:1px solid var(--line); border-radius:6px; background:var(--bg); color:var(--ink); width:100%; }
+  .types { display:grid; gap:8px; grid-template-columns:repeat(auto-fit, minmax(170px, 1fr)); }
+  .type { border:1px solid var(--line); border-radius:8px; padding:10px; cursor:pointer; } .type.on { border-color:var(--accent); box-shadow:0 0 0 1px var(--accent) inset; }
+  .type b { display:block; } .type span { color:var(--muted); font-size:12px; }
+  .bar { height:10px; background:var(--bg); border:1px solid var(--line); border-radius:99px; overflow:hidden; } .bar > i { display:block; height:100%; background:var(--accent); width:0; transition:width .4s; }
+  table { border-collapse:collapse; width:100%; font-variant-numeric:tabular-nums; } th, td { text-align:left; padding:6px 8px; border-bottom:1px solid var(--line); }
+  th { color:var(--muted); font-size:12px; } td.num { text-align:right; }
+  .badge { display:inline-block; padding:1px 8px; border-radius:4px; font-size:11px; font-weight:800; color:#fff; background:var(--muted); }
+  .badge.pass { background:var(--ok); } .badge.warn { background:var(--warn); } .badge.fail { background:var(--bad); }
+  #three { width:100%; height:300px; border-radius:8px; background:var(--bg); overflow:hidden; }
+  .euler { display:flex; gap:16px; font-variant-numeric:tabular-nums; margin-top:8px; } .euler b { font-size:20px; }
+  .u-legend { font-size:12px; color:var(--ink); } .hidden { display:none !important; }
+  .msg { padding:8px 12px; border-radius:8px; background:var(--bg); border:1px solid var(--line); margin:8px 0; } .msg.bad { border-color:var(--bad); color:var(--bad); }
+</style>
+</head>
+<body>
+<header>
+  <h1>IMU Test Console</h1>
+  <nav>
+    <a href="#home" data-v="home">Home</a><a href="#demo" data-v="demo">Live demo</a>
+    <a href="#drift" data-v="drift">Drift analysis</a><a href="#sessions" data-v="sessions">Sessions</a>
+  </nav>
+  <div class="conn" id="conn"></div>
+</header>
+<main>
+  <!-- HOME -->
+  <section class="view" id="v-home">
+    <div class="big">
+      <button class="mode" onclick="go('drift')"><h2>Drift analysis</h2><p>Guided static test: setup checks, timed recording with live data quality, then an automatic analysis and a report.</p></button>
+      <button class="mode" onclick="go('demo')"><h2>Live demo</h2><p>Raw accelerometer, gyroscope and magnetometer live, a 3D phone driven by the Mahony filter, and a drift race. Nothing is saved.</p></button>
+    </div>
+    <div class="card" style="margin-top:16px"><h2>Phone connection</h2><p class="sub">Checked every few seconds over adb. The console sets up the port forward itself.</p><ul class="check" id="home-conn"></ul></div>
+  </section>
+
+  <!-- DEMO -->
+  <section class="view" id="v-demo">
+    <div class="grid">
+      <div class="card wide"><div class="stats" id="demo-stats"></div></div>
+      <div class="card"><div class="row" style="justify-content:space-between"><h2>Attitude (Mahony filter)</h2><button onclick="api('/api/demo/reset')">Re-level</button></div>
+        <p class="sub">Accelerometer + gyroscope fusion. Yaw is relative to the start: there is no heading reference without the magnetometer.</p>
+        <div id="three"></div><div class="euler" id="euler"></div></div>
+      <div class="card"><div class="row" style="justify-content:space-between"><h2>Drift race</h2>
+          <span class="row"><button class="primary" id="race-btn" onclick="race()">Start race</button></span></div>
+        <p class="sub">Leave the phone still. Three integrations start from the same attitude: raw gyro, gyro with the bias measured over the last 5 s removed, and Mahony. Their difference is drift.</p>
+        <div id="c_race_tilt"></div><div id="c_race_head"></div><p class="sub" id="race-note"></p></div>
+      <div class="card"><div class="row" style="justify-content:space-between"><h2>Accelerometer</h2><button id="pause-btn" onclick="paused=!paused; this.textContent=paused?'Resume':'Pause'">Pause</button></div><p class="sub">m/s², last 10 s</p><div id="c_dacc"></div></div>
+      <div class="card"><h2>Gyroscope</h2><p class="sub">°/s, last 10 s</p><div id="c_dgyro"></div></div>
+      <div class="card"><h2>Magnetometer</h2><p class="sub">µT, last 10 s</p><div id="c_dmag"></div></div>
+    </div>
+  </section>
+
+  <!-- DRIFT -->
+  <section class="view" id="v-drift">
+    <div id="drift-setup" class="grid">
+      <div class="card"><h2>1. Setup checklist</h2><p class="sub">Start stays disabled until every item is green.</p><ul class="check" id="checklist"></ul></div>
+      <div class="card"><h2>2. Test</h2>
+        <div class="types" id="types"></div>
+        <label class="f" for="minutes">Duration, minutes (0 = until you press Stop)</label><input type="number" id="minutes" min="0" step="1">
+        <label class="f" for="rname">Name</label><input type="text" id="rname">
+        <label class="f" for="note">Note</label><input type="text" id="note" placeholder="e.g. floor, untouched, plugged in">
+        <label class="row" style="margin-top:10px" id="calib-row"><input type="checkbox" id="calib"> Apply calib.yaml in the analysis</label>
+        <div class="row" style="margin-top:14px"><button class="primary" id="start-btn" onclick="startRec()">Start test</button><span class="sub" id="start-why" style="margin:0"></span></div>
+        <div id="start-err"></div>
+      </div>
+    </div>
+    <div id="drift-rec" class="grid hidden">
+      <div class="card wide">
+        <div class="row" style="justify-content:space-between"><h2 id="rec-title">Recording</h2>
+          <span class="row"><button onclick="api('/api/record/reset_drift')">Reset drift</button><button class="danger" id="stop-btn" onclick="stopRec()">Stop</button></span></div>
+        <div class="bar" style="margin:10px 0"><i id="rec-bar"></i></div>
+        <div class="stats" id="rec-stats"></div>
+        <div id="rec-events"></div>
+      </div>
+      <div class="card"><h2>Gyroscope, raw</h2><p class="sub">°/s, last 10 s. Spikes mean the phone was touched.</p><div id="c_rgyro"></div></div>
+      <div class="card"><h2>Heading drift</h2><p class="sub">Integrated gyro after the 10 s bias estimate, °. Dashed: predicted ±1σ (z).</p><div id="c_rhead"></div></div>
+      <div class="card"><h2>Position drift (free inertial)</h2><p class="sub">Horizontal, m. Dashed: predicted 1σ.</p><div id="c_rpos"></div></div>
+      <div class="card"><h2>Allan deviation, gyroscope</h2><p class="sub">Updates every 30 s; provisional until the run exceeds 1 h.</p><div id="c_rallan"></div></div>
+    </div>
+    <div id="drift-ana" class="card hidden" style="margin-top:16px">
+      <h2 id="ana-title">Analysis</h2><p class="sub" id="ana-stage"></p><div class="bar"><i id="ana-bar"></i></div>
+      <div class="row" style="margin-top:12px"><a class="btn primary hidden" id="ana-report" target="_blank">Open report</a><button onclick="newTest()">New test</button></div>
+      <div id="ana-err"></div>
+    </div>
+  </section>
+
+  <!-- SESSIONS -->
+  <section class="view" id="v-sessions">
+    <div class="card"><div class="row" style="justify-content:space-between"><h2>Sessions</h2><button onclick="loadSessions()">Refresh</button></div>
+      <p class="sub">Combined report: choose one main session (●) and the extra sessions to compare (☑), for example the long static run plus the turn-on sessions.</p>
+      <div style="overflow-x:auto"><table id="sess"></table></div>
+      <div class="row" style="margin-top:12px"><button class="primary" onclick="combined()">Build combined report</button><span id="comb-msg" class="sub" style="margin:0"></span></div>
+    </div>
+  </section>
+</main>
+<script>
+const DEG = 180 / Math.PI;
+const $ = id => document.getElementById(id);
+const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const fmt = (v, d = 1) => (v === null || v === undefined || !isFinite(v)) ? '–' : Number(v).toFixed(d);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+let S = null, view = 'home', paused = false, kind = 'static', ws = null, lastRec = null, raceOn = false;
+const TYPES = { static: ['Static drift', 'Phone untouched, ≥ 60 min. Full noise model, drift and filter analysis.', 120],
+                turnon: ['Turn-on repeatability', 'Restart the Sensor Server app first. 5 min each, repeat 3×.', 5],
+                quick: ['Quick check', '1 min: is the stream and the setup healthy?', 1] };
+
+// ---------- navigation
+function go(v) { location.hash = v; }
+function show() {
+  view = (location.hash || '#home').slice(1);
+  document.querySelectorAll('.view').forEach(e => e.classList.toggle('on', e.id === 'v-' + view));
+  document.querySelectorAll('nav a').forEach(a => a.classList.toggle('on', a.dataset.v === view));
+  if (ws && ws.readyState === 1) ws.send(JSON.stringify({ view }));
+  if (view === 'demo') initThree();
+  if (view === 'sessions') loadSessions();
+  setTimeout(resizeAll, 30);
+}
+window.addEventListener('hashchange', show);
+async function api(url, body) {
+  const r = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body || {}) });
+  return r.json();
+}
+
+// ---------- charts
+const charts = {};
+const axis = () => ({ stroke: css('--muted'), grid: { stroke: css('--line'), width: 1 }, ticks: { stroke: css('--line') } });
+const line = (label, color, extra = {}) => Object.assign({ label, stroke: color, width: 1.5, points: { show: false } }, extra);
+const xyz = () => [line('x', css('--x')), line('y', css('--y')), line('z', css('--z'))];
+const dashed = l => line(l, css('--env'), { dash: [6, 4] });
+function chart(id, series, opt = {}) {
+  if (charts[id]) return charts[id];
+  const el = $(id); const w = Math.max(260, el.clientWidth || 400);
+  charts[id] = new uPlot({ width: w, height: opt.h || 210, series: [{}].concat(series), legend: { live: false },
+    scales: opt.scales || { x: { time: false } }, cursor: { drag: { x: false, y: false } },
+    axes: [Object.assign(axis(), opt.xl ? { label: opt.xl } : {}), Object.assign(axis(), opt.yl ? { label: opt.yl } : {})] },
+    [[]].concat(series.map(() => [])), el);
+  return charts[id];
+}
+function resizeAll() { for (const id in charts) { const w = $(id).clientWidth; if (w > 0) charts[id].setSize({ width: w, height: charts[id].height }); } }
+window.addEventListener('resize', resizeAll);
+
+// ---------- connection bar + checklist
+function connItems(s) {
+  const c = s.conn, st = s.still, r = s.rates;
+  return [
+    ['Phone over adb', c.adb === 'device', c.adb === 'device' ? `${c.model || ''} (${c.serial || ''})` : c.adb, c.adb === 'unauthorized' ? 'Accept the USB debugging prompt on the phone.' : 'Plug in the USB cable; enable USB debugging.'],
+    ['Port forward', c.forward, c.forward ? 'tcp:8080 → phone' : 'not set', 'Set automatically once the phone is connected.'],
+    ['Sensor stream', c.stream === 'live' && r.gyro.rate_hz >= 390, c.stream === 'live' ? `${fmt(r.acc.rate_hz)} / ${fmt(r.gyro.rate_hz)} Hz` : c.stream, 'Open Sensor Server, tap Start, set the sampling rate to the fastest value.'],
+    ['Plugged in', c.plugged === true, c.plugged === null ? 'checking' : (c.plugged ? 'yes' : 'no'), 'Charge during long tests so the phone does not sleep or throttle.'],
+    ['Stay awake', c.stay_awake === true, c.stay_awake === null ? 'checking' : (c.stay_awake ? 'on' : 'off'), 'Developer options → Stay awake.'],
+    ['Sensor Server in foreground', c.foreground === true, c.foreground === null ? 'checking' : (c.foreground ? 'yes' : 'no'), 'Bring the app to the front and keep the screen on.'],
+    ['Phone still', st.still, st.gyro_dps === null ? 'waiting' : `gyro ${fmt(st.gyro_dps, 2)} °/s, accel ${fmt(st.acc_std, 3)} m/s²`, 'Do not touch the phone or the table.'],
+    ['Phone flat', st.flat, st.tilt_deg === null ? 'waiting' : `${fmt(st.tilt_deg, 1)}° from level`, 'Lay it screen up on a solid, level surface (the floor is best).'],
+  ];
+}
+function renderConn(s) {
+  const c = s.conn, live = c.stream === 'live';
+  const pill = (cls, t) => `<span class="pill ${cls}"><span class="dot"></span>${esc(t)}</span>`;
+  $('conn').innerHTML = pill(c.adb === 'device' ? 'ok' : 'bad', c.adb === 'device' ? 'phone' : c.adb) +
+    pill(live ? 'ok' : 'bad', live ? `${fmt(s.rates.gyro.rate_hz, 0)} Hz` : 'no stream') +
+    (c.temp_c ? pill('', `${fmt(c.temp_c, 1)} °C`) : '') +
+    (s.rec && s.rec.active ? pill('warn', 'recording') : '') + (s.jobs.length ? pill('warn', `analysing ${s.jobs.length}`) : '');
+  const items = connItems(s);
+  const li = ([n, ok, val, hint]) => `<li><span class="mark ${ok ? 'ok' : 'bad'}">${ok ? '✓' : '✗'}</span><span><b>${esc(n)}</b> · ${esc(val)}${ok ? '' : `<span class="hint">${esc(hint)}</span>`}</span></li>`;
+  $('home-conn').innerHTML = items.slice(0, 3).map(li).join('');
+  const manual = [['unrestricted', 'Battery set to Unrestricted for Sensor Server', 'Settings → Apps → Sensor Server → Battery → Unrestricted.']];
+  if (kind === 'turnon') manual.push(['restarted', 'Sensor Server restarted since the last session', 'Stop and start the server (or reboot the phone): that is the "turn-on".']);
+  const keep = {}; document.querySelectorAll('#checklist input').forEach(i => keep[i.id] = i.checked);
+  $('checklist').innerHTML = items.map(li).join('') + manual.map(([id, n, h]) =>
+    `<li><span class="mark"><input type="checkbox" id="m-${id}" ${keep['m-' + id] ? 'checked' : ''}></span><span><b>${esc(n)}</b><span class="hint">${esc(h)}</span></span></li>`).join('');
+  document.querySelectorAll('#checklist input').forEach(i => i.onchange = () => gate(s));
+  $('calib-row').classList.toggle('hidden', !s.calib_available);
+  gate(s);
+}
+function gate(s) {
+  const bad = connItems(s).filter(i => !i[1]).map(i => i[0]);
+  document.querySelectorAll('#checklist input').forEach(i => { if (!i.checked) bad.push('manual checks'); });
+  const busy = s.rec && s.rec.active;
+  $('start-btn').disabled = bad.length > 0 || busy;
+  $('start-why').textContent = busy ? 'A test is running.' : (bad.length ? 'Waiting for: ' + [...new Set(bad)].join(', ') : 'Ready.');
+}
+
+// ---------- drift: configure, record, analyse
+function renderTypes() {
+  $('types').innerHTML = Object.entries(TYPES).map(([k, [n, d]]) => `<div class="type ${k === kind ? 'on' : ''}" onclick="pickType('${k}')"><b>${n}</b><span>${d}</span></div>`).join('');
+}
+function pickType(k) { kind = k; renderTypes(); $('minutes').value = TYPES[k][2]; $('rname').value = defaultName(); if (S) renderConn(S); }
+function defaultName() { const d = new Date(), p = n => String(n).padStart(2, '0'); return `${kind}_${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}_${p(d.getHours())}${p(d.getMinutes())}`; }
+async function startRec() {
+  $('start-err').innerHTML = '';
+  const r = await api('/api/record/start', { kind, minutes: +$('minutes').value || 0, name: $('rname').value, note: $('note').value, calib: $('calib').checked });
+  if (!r.ok) $('start-err').innerHTML = `<div class="msg bad">${esc(r.error)}</div>`;
+}
+async function stopRec() { if (confirm('Stop the test now? The data recorded so far is kept and analysed.')) await api('/api/record/stop'); }
+function newTest() { lastRec = null; $('drift-ana').classList.add('hidden'); $('drift-setup').classList.remove('hidden'); $('rname').value = defaultName(); }
+
+function renderRec(s) {
+  const r = s.rec;
+  const recording = r && r.active;
+  const analysing = r && !r.active && lastRec === r.name;
+  $('drift-setup').classList.toggle('hidden', recording || analysing);
+  $('drift-rec').classList.toggle('hidden', !recording);
+  $('drift-ana').classList.toggle('hidden', !analysing);
+  if (recording) {
+    lastRec = r.name;
+    $('rec-title').textContent = `Recording ${r.name} · ${TYPES[r.kind][0]}`;
+    const pct = r.minutes ? 100 * r.elapsed_s / (r.minutes * 60) : 0;
+    $('rec-bar').style.width = (r.minutes ? Math.min(100, pct) : 100) + '%';
+    const st = r.stats, g = st.channels.gyro, a = st.channels.acc, d = st.disturbance;
+    const t = sec => { sec = Math.round(sec); return `${Math.floor(sec / 3600)}:${String(Math.floor(sec / 60) % 60).padStart(2, '0')}:${String(sec % 60).padStart(2, '0')}`; };
+    const stat = (l, v, bad) => `<div class="stat ${bad ? 'bad' : ''}"><div class="l">${l}</div><div class="v">${v}</div></div>`;
+    $('rec-stats').innerHTML = stat('Elapsed', t(r.elapsed_s)) + stat('Remaining', r.remaining_s === null ? '—' : t(r.remaining_s)) +
+      stat('Rate acc / gyro', `${fmt(a.rate_hz, 0)} / ${fmt(g.rate_hz, 0)} Hz`, g.rate_hz < 390) + stat('Timing jitter', `${fmt(g.dt_std_us, 0)} µs`) +
+      stat('Lost samples', a.missing + g.missing, a.missing + g.missing > 0) + stat('Stillness', d.validity, d.validity !== 'valid') +
+      stat('Battery', s.conn.temp_c ? fmt(s.conn.temp_c, 1) + ' °C' : '–') + stat('Status', g.aligning ? 'estimating bias' : 'integrating');
+    $('rec-events').innerHTML = d.n_events ? `<div class="msg bad">${d.n_events} disturbance(s), ${d.disturbed_s} s disturbed. Latest: ` +
+      d.events.slice(-5).map(e => `${t(e.start_s)} (${fmt(e.peak_dps, 2)} °/s${e.tilt_deg > 0.5 ? ', moved ' + fmt(e.tilt_deg, 1) + '°' : ''})`).join(', ') +
+      '. The analysis will use undisturbed data only.</div>' : '';
+    if (g.plot) chart('c_rgyro', xyz(), { xl: 's' }).setData([g.plot[0]].concat(g.plot.slice(1).map(v => v.map(x => x * DEG))));
+    if (g.drift && g.envelope) {
+      const env = g.envelope.i1[2].map(v => v * DEG);
+      chart('c_rhead', xyz().concat([dashed('+1σ z'), dashed('−1σ z')]), { xl: 's', yl: '°' })
+        .setData([g.drift[0], g.drift[1].map(v => v * DEG), g.drift[2].map(v => v * DEG), g.drift[3].map(v => v * DEG), env, env.map(v => -v)]);
+    }
+    if (a.drift && a.envelope) {
+      const e = a.envelope.i2;
+      chart('c_rpos', [line('measured |xy|', css('--y'), { width: 2 }), dashed('predicted 1σ')], { xl: 's', yl: 'm' })
+        .setData([a.drift[0], a.drift[4].map((v, i) => Math.hypot(v, a.drift[5][i])), e[0].map((v, i) => Math.hypot(v, e[1][i]))]);
+    }
+    if (g.allan && g.allan.x) chart('c_rallan', xyz(), { xl: 'τ [s]', yl: '°/s', scales: { x: { time: false, distr: 3 }, y: { distr: 3 } } })
+      .setData([g.allan.x.taus, g.allan.x.adev.map(v => v * DEG), g.allan.y.adev.map(v => v * DEG), g.allan.z.adev.map(v => v * DEG)]);
+  }
+  if (analysing) {
+    const p = r.progress;
+    $('ana-title').textContent = `Analysis of ${r.name}`;
+    if (p) {
+      $('ana-bar').style.width = (p.done ? 100 : 100 * p.stage / p.n) + '%';
+      $('ana-stage').textContent = p.error ? 'Analysis failed.' : (p.done ? `Done in ${fmt(p.elapsed_s, 0)} s.` : `Step ${p.stage + 1} of ${p.n}: ${p.name}…`);
+      $('ana-err').innerHTML = p.error ? `<div class="msg bad">${esc(p.error)} (see runs/${esc(r.name)}/analysis.log)</div>` : '';
+      const a = $('ana-report'); a.classList.toggle('hidden', !(p.done && !p.error)); a.href = `/runs/${encodeURIComponent(r.name)}/report.html`;
+    } else $('ana-stage').textContent = 'Starting…';
+  }
+}
+
+// ---------- demo
+let three = null;
+function initThree() {
+  if (three || !window.THREE) return;
+  const el = $('three'), w = el.clientWidth, h = el.clientHeight;
+  if (w === 0) return;                                   // view not visible yet
+  const scene = new THREE.Scene(), cam = new THREE.PerspectiveCamera(40, w / h, 0.01, 10);
+  cam.position.set(0.22, 0.22, 0.32); cam.lookAt(0, 0, 0);
+  const rend = new THREE.WebGLRenderer({ antialias: true, alpha: true }); rend.setSize(w, h); el.appendChild(rend.domElement);
+  scene.add(new THREE.AmbientLight(0xffffff, 0.55)); const dl = new THREE.DirectionalLight(0xffffff, 0.8); dl.position.set(1, 2, 1.5); scene.add(dl);
+  // body frame (Android: x right, y to the top edge, z out of the screen) mapped to three.js (y up): (x, z, -y)
+  const phone = new THREE.Group();
+  phone.add(new THREE.Mesh(new THREE.BoxGeometry(0.075, 0.009, 0.16), new THREE.MeshStandardMaterial({ color: 0x3a4250, metalness: 0.3, roughness: 0.5 })));
+  const scr = new THREE.Mesh(new THREE.PlaneGeometry(0.068, 0.15), new THREE.MeshStandardMaterial({ color: 0x2457c5, emissive: 0x0d2a6b }));
+  scr.rotation.x = -Math.PI / 2; scr.position.y = 0.0046; phone.add(scr);
+  const cam_ = new THREE.Mesh(new THREE.CylinderGeometry(0.006, 0.006, 0.003, 20), new THREE.MeshStandardMaterial({ color: 0x111111 }));
+  cam_.position.set(-0.022, -0.006, -0.065); phone.add(cam_);
+  phone.add(new THREE.AxesHelper(0.06));
+  scene.add(phone);
+  const grid = new THREE.GridHelper(0.5, 10, 0x888888, 0x888888); grid.position.y = -0.06; grid.material.opacity = 0.3; grid.material.transparent = true; scene.add(grid);
+  three = { scene, cam, rend, phone };
+  rend.domElement.style.display = 'block';
+  new ResizeObserver(() => { const w2 = el.clientWidth, h2 = el.clientHeight; if (w2 > 0) { rend.setSize(w2, h2); cam.aspect = w2 / h2; cam.updateProjectionMatrix(); } }).observe(el);
+  (function loop() { requestAnimationFrame(loop); rend.render(scene, cam); })();
+}
+function race() {
+  api(raceOn ? '/api/demo/race_stop' : '/api/demo/race_start');
+}
+function renderDemo(m) {
+  if (three) three.phone.quaternion.set(m.q[1], m.q[3], -m.q[2], m.q[0]);
+  raceOn = !!m.race; $('race-btn').textContent = raceOn ? 'Stop race' : 'Start race';
+  $('euler').innerHTML = ['Roll', 'Pitch', 'Yaw'].map((n, i) => `<span>${n} <b>${fmt(m.euler[i], 1)}°</b></span>`).join('');
+  const r = m.rates, stat = (l, v, bad) => `<div class="stat ${bad ? 'bad' : ''}"><div class="l">${l}</div><div class="v">${v}</div></div>`;
+  $('demo-stats').innerHTML = stat('Accelerometer', fmt(r.acc.rate_hz, 1) + ' Hz') + stat('Gyroscope', fmt(r.gyro.rate_hz, 1) + ' Hz') +
+    stat('Magnetometer', fmt(r.mag.rate_hz, 1) + ' Hz') + stat('Timing jitter', fmt(r.gyro.dt_std_us, 0) + ' µs') +
+    stat('Lost samples', (r.acc.lost || 0) + (r.gyro.lost || 0), (r.acc.lost || 0) + (r.gyro.lost || 0) > 0) +
+    stat('Samples', ((r.acc.n || 0) + (r.gyro.n || 0) + (r.mag.n || 0)).toLocaleString());
+  if (!paused) {
+    if (m.plots.acc) chart('c_dacc', xyz(), { xl: 's' }).setData(m.plots.acc);
+    if (m.plots.gyro) chart('c_dgyro', xyz(), { xl: 's' }).setData(m.plots.gyro);
+    if (m.plots.mag) chart('c_dmag', xyz(), { xl: 's' }).setData(m.plots.mag);
+  }
+  const rc = m.race;
+  if (rc && rc.t.length) {
+    const s3 = () => [line('raw gyro', css('--c1')), line('bias removed', css('--c2')), line('Mahony', css('--c3'), { width: 2 })];
+    chart('c_race_tilt', s3(), { xl: 's', yl: 'tilt error °', h: 170 }).setData([rc.t, rc.tilt.raw, rc.tilt.corr, rc.tilt.mahony]);
+    chart('c_race_head', s3(), { xl: 's', yl: 'heading error °', h: 170 }).setData([rc.t, rc.head.raw, rc.head.corr, rc.head.mahony]);
+    const k = rc.t.length - 1;
+    $('race-note').textContent = `After ${fmt(rc.t[k], 0)} s: tilt error ${fmt(rc.tilt.raw[k], 2)}° raw, ${fmt(rc.tilt.corr[k], 2)}° bias removed, ` +
+      `${fmt(rc.tilt.mahony[k], 2)}° Mahony (gravity pulls tilt back). Heading has no such reference, so even Mahony drifts. Bias removed: ` +
+      rc.bias_dps.map(b => fmt(b, 3)).join(', ') + ' °/s.';
+  }
+}
+
+// ---------- sessions
+async function loadSessions() {
+  const rows = await (await fetch('/api/sessions')).json();
+  const badge = w => w ? `<span class="badge ${w}">${w.toUpperCase()}</span>` : '';
+  $('sess').innerHTML = '<tr><th>Main</th><th>Extra</th><th>Session</th><th>Type</th><th>Started</th><th class="num">Minutes</th><th>Stillness</th><th>Checks</th><th>Report</th><th></th></tr>' +
+    rows.map(r => {
+      const p = r.progress, prog = r.recording ? 'recording…' : (r.running && p && !p.done ? `${p.name}…` : '');
+      return `<tr><td><input type="radio" name="main" value="${esc(r.name)}"></td><td><input type="checkbox" class="extra" value="${esc(r.name)}"></td>
+        <td><b>${esc(r.name)}</b><span class="hint">${esc(r.note)}</span></td><td>${esc(r.kind)}</td><td>${esc(r.started)}</td><td class="num">${fmt(r.duration_min, 1)}</td>
+        <td>${esc(r.validity || '')}</td><td>${badge(r.worst)}</td>
+        <td>${r.report ? `<a class="btn" target="_blank" href="/runs/${encodeURIComponent(r.name)}/report.html">Open</a>` : esc(prog || (p && p.error ? 'failed' : '—'))}</td>
+        <td>${r.recording || r.kind === 'combined' ? '' : `<button onclick="reanalyse('${esc(r.name)}','${esc(r.kind)}')">Re-analyse</button>`}</td></tr>`;
+    }).join('');
+}
+async function reanalyse(name, k) { await api('/api/analyse', { name, kind: ['static', 'quick', 'turnon'].includes(k) ? k : 'static', calib: S && S.calib_available });
+  setTimeout(loadSessions, 500); }
+async function combined() {
+  const main = (document.querySelector('input[name=main]:checked') || {}).value;
+  const extras = [...document.querySelectorAll('.extra:checked')].map(i => i.value).filter(v => v !== main);
+  const r = await api('/api/combined', { main, extras, calib: S && S.calib_available });
+  $('comb-msg').textContent = r.ok ? `Building ${r.job}… it will appear in the list.` : r.error;
+  setTimeout(loadSessions, 800);
+}
+setInterval(() => { if (view === 'sessions') loadSessions(); }, 5000);
+
+// ---------- socket
+function connect() {
+  ws = new WebSocket(`ws://${location.host}/ws`);
+  ws.onopen = () => ws.send(JSON.stringify({ view }));
+  ws.onmessage = e => {
+    const m = JSON.parse(e.data);
+    if (m.type === 'status') { S = m; renderConn(m); renderRec(m); }
+    else if (m.type === 'demo' && view === 'demo') renderDemo(m);
+  };
+  ws.onclose = () => { $('conn').innerHTML = '<span class="pill bad"><span class="dot"></span>console offline</span>'; setTimeout(connect, 1500); };
+}
+renderTypes(); pickType('static'); show(); connect();
+</script>
+</body>
+</html>

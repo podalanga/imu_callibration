@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IMU Drift Monitor</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uplot@1.6.30/dist/uPlot.min.css">
+<script src="https://cdn.jsdelivr.net/npm/uplot@1.6.30/dist/uPlot.iife.min.js"></script>
+<style>
+  :root { --bg:#f6f7f9; --card:#fff; --ink:#1d2330; --muted:#677084; --line:#dde1e8; --ok:#1b7f4b; --bad:#b42318; --warn:#b54708;
+          --x:#d1495b; --y:#2e86ab; --z:#3b9b4b; --env:#7a5195; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg:#12151b; --card:#1b2029; --ink:#e6e9ef; --muted:#9aa3b5; --line:#2c3340; } }
+  :root[data-theme="dark"] { --bg:#12151b; --card:#1b2029; --ink:#e6e9ef; --muted:#9aa3b5; --line:#2c3340; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:14px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  header { display:flex; flex-wrap:wrap; gap:12px; align-items:center; padding:12px 16px; border-bottom:1px solid var(--line); background:var(--card); position:sticky; top:0; z-index:2; }
+  header h1 { font-size:17px; margin:0 12px 0 0; }
+  .pill { padding:2px 10px; border-radius:99px; font-weight:600; font-size:12px; background:var(--line); }
+  .pill.live { background:var(--ok); color:#fff; } .pill.bad { background:var(--bad); color:#fff; }
+  .kv { color:var(--muted); } .kv b { color:var(--ink); font-variant-numeric:tabular-nums; }
+  button { margin-left:auto; font:inherit; padding:6px 14px; border-radius:6px; border:1px solid var(--line); background:var(--bg); color:var(--ink); cursor:pointer; }
+  main { padding:16px; display:grid; gap:16px; grid-template-columns:repeat(auto-fit, minmax(min(100%, 520px), 1fr)); }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:12px 14px; min-width:0; }
+  .card h2 { font-size:14px; margin:0 0 2px; } .card p.sub { margin:0 0 8px; color:var(--muted); font-size:12px; }
+  .health { display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); gap:8px; }
+  .metric { border:1px solid var(--line); border-radius:8px; padding:6px 10px; }
+  .metric .l { color:var(--muted); font-size:12px; } .metric .v { font-size:18px; font-weight:600; font-variant-numeric:tabular-nums; }
+  .metric.bad .v { color:var(--bad); } .metric.warn .v { color:var(--warn); }
+  table { border-collapse:collapse; width:100%; font-variant-numeric:tabular-nums; font-size:13px; }
+  th, td { text-align:right; padding:4px 6px; border-bottom:1px solid var(--line); } th:first-child, td:first-child { text-align:left; }
+  .chart { width:100%; } .wide { grid-column:1 / -1; }
+  .u-legend { font-size:12px; color:var(--ink); } .u-axis { color:var(--muted); }
+</style>
+</head>
+<body>
+<header>
+  <h1>IMU Drift Monitor</h1>
+  <span id="status" class="pill">connecting</span>
+  <span class="kv">recording <b id="dur">0 s</b></span>
+  <span class="kv">battery <b id="temp">–</b></span>
+  <span class="kv" id="aligning"></span>
+  <button id="reset" title="Re-estimate the bias from the next still period and restart the drift integration">Reset drift</button>
+</header>
+<main>
+  <section class="card wide">
+    <h2>Acquisition health</h2>
+    <p class="sub">From hardware timestamps. A gap is an interval over 1.5× the nominal one; red means samples were lost.</p>
+    <div class="health" id="health"></div>
+  </section>
+  <section class="card"><h2>Accelerometer, raw</h2><p class="sub">Last 10 s, m/s², shown at 50 Hz</p><div class="chart" id="c_acc"></div></section>
+  <section class="card"><h2>Gyroscope, raw</h2><p class="sub">Last 10 s, °/s, shown at 50 Hz</p><div class="chart" id="c_gyro"></div></section>
+  <section class="card wide">
+    <h2>Static bias and noise</h2>
+    <p class="sub">Running mean and standard deviation since start. Android's own gyro bias estimate is shown for comparison; it is not applied.</p>
+    <table id="bias"></table>
+  </section>
+  <section class="card"><h2>Heading drift</h2><p class="sub">Integrated gyro after removing the initial bias, degrees. Dashed: predicted ±1σ for z from the Allan fit.</p><div class="chart" id="c_head"></div></section>
+  <section class="card"><h2>Position drift (free inertial, static)</h2><p class="sub">Horizontal position from double-integrated accel, metres. Dashed: predicted 1σ.</p><div class="chart" id="c_pos"></div></section>
+  <section class="card"><h2>Allan deviation: gyroscope</h2><p class="sub" id="allan_g_txt">Needs 20 s of data; updates every 30 s. Provisional until the run exceeds 1 h.</p><div class="chart" id="c_allan_g"></div></section>
+  <section class="card"><h2>Allan deviation: accelerometer</h2><p class="sub" id="allan_a_txt">Needs 20 s of data; updates every 30 s.</p><div class="chart" id="c_allan_a"></div></section>
+  <section class="card wide"><h2>Gyro bias vs temperature</h2><p class="sub">10 s means of the gyro (°/s) and battery temperature (°C, right axis). Thermal drift shows as the two moving together.</p><div class="chart" id="c_temp"></div></section>
+</main>
+<script>
+const DEG = 180 / Math.PI, G = 9.80665;
+const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const COL = { x: css('--x'), y: css('--y'), z: css('--z'), env: css('--env') };
+const charts = {};
+const fmt = (v, d = 3) => (v === null || v === undefined || !isFinite(v)) ? '–' : Number(v).toFixed(d);
+const sci = v => (v === null || v === undefined || !isFinite(v)) ? '–' : Number(v).toExponential(2);
+
+function width(id) { return Math.max(280, document.getElementById(id).clientWidth); }
+function axisColors() { return { stroke: css('--muted'), grid: { stroke: css('--line'), width: 1 }, ticks: { stroke: css('--line') } }; }
+function make(id, series, opts = {}) {
+  const el = document.getElementById(id);
+  const o = Object.assign({ width: width(id), height: 230, series: [{}].concat(series), legend: { live: false },
+    axes: [Object.assign({}, axisColors(), opts.xlabel ? { label: opts.xlabel } : {}),
+           Object.assign({}, axisColors(), opts.ylabel ? { label: opts.ylabel } : {})].concat(opts.axes || []),
+    scales: opts.scales || { x: { time: false } }, cursor: { drag: { x: false, y: false } } }, opts.extra || {});
+  charts[id] = new uPlot(o, series.map(() => []).concat([[]]).slice(0, series.length + 1), el);
+  return charts[id];
+}
+const line = (label, color, extra = {}) => Object.assign({ label, stroke: color, width: 1.5, points: { show: false } }, extra);
+const xyz = (sfx = '') => [line('x' + sfx, COL.x), line('y' + sfx, COL.y), line('z' + sfx, COL.z)];
+const dashed = (label) => line(label, COL.env, { dash: [6, 4], width: 1.5 });
+const logScales = { x: { time: false, distr: 3 }, y: { distr: 3 } };
+
+make('c_acc', xyz(), { xlabel: 's' });
+make('c_gyro', xyz(), { xlabel: 's' });
+make('c_head', xyz().concat([dashed('+1σ z'), dashed('−1σ z')]), { xlabel: 's since alignment', ylabel: '°' });
+make('c_pos', [line('measured |xy|', COL.y, { width: 2 }), dashed('predicted 1σ'), line('white noise only', COL.env, { dash: [2, 3], width: 1 })], { xlabel: 's since alignment', ylabel: 'm' });
+make('c_allan_g', xyz(), { xlabel: 'τ [s]', ylabel: '°/s', scales: logScales });
+make('c_allan_a', xyz(), { xlabel: 'τ [s]', ylabel: 'm/s²', scales: logScales });
+make('c_temp', [line('gyro x', COL.x), line('gyro y', COL.y), line('gyro z', COL.z), line('battery °C', css('--ink'), { scale: 'T', dash: [5, 3] })],
+     { xlabel: 'min', ylabel: '°/s', scales: { x: { time: false }, T: {} }, axes: [Object.assign({ scale: 'T', side: 1, label: '°C' }, axisColors())] });
+window.addEventListener('resize', () => { for (const id in charts) charts[id].setSize({ width: width(id), height: 230 }); });
+
+function metric(label, value, cls = '') { return `<div class="metric ${cls}"><div class="l">${label}</div><div class="v">${value}</div></div>`; }
+
+function render(s) {
+  const st = document.getElementById('status');
+  st.textContent = s.status; st.className = 'pill ' + (s.status === 'live' || s.status.startsWith('replay') ? 'live' : (s.status.startsWith('disc') ? 'bad' : ''));
+  const ch = s.channels, a = ch.acc, g = ch.gyro;
+  document.getElementById('dur').textContent = fmt(Math.max(a.duration_s, g.duration_s), 0) + ' s';
+  document.getElementById('temp').textContent = s.temp_c === null ? '–' : fmt(s.temp_c, 1) + ' °C';
+  document.getElementById('aligning').textContent = g.aligning ? 'estimating initial bias, keep the phone still…' : '';
+
+  let h = '';
+  for (const [n, c] of Object.entries(ch)) {
+    h += metric(`${n} rate`, fmt(c.rate_hz, 1) + ' Hz');
+    h += metric(`${n} dt median / std`, `${fmt(c.dt_median_ms, 3)} ms / ${fmt(c.dt_std_us, 0)} µs`);
+    h += metric(`${n} max dt`, fmt(c.dt_max_ms, 2) + ' ms', c.dt_max_ms > 1.5 * c.dt_median_ms ? 'warn' : '');
+    h += metric(`${n} gaps (lost samples)`, `${c.gaps} (${c.missing})`, c.missing > 0 ? 'bad' : '');
+    h += metric(`${n} samples`, c.n.toLocaleString());
+  }
+  document.getElementById('health').innerHTML = h;
+
+  if (a.plot) charts.c_acc.setData(a.plot);
+  if (g.plot) charts.c_gyro.setData([g.plot[0]].concat(g.plot.slice(1).map(r => r.map(v => v * DEG))));
+
+  const rows = [['Axis', 'acc mean [m/s²]', 'acc std [mg]', 'gyro mean [°/s]', 'gyro std [°/s]', 'Android gyro bias [°/s]']];
+  ['x', 'y', 'z'].forEach((ax, i) => rows.push([ax, fmt(a.mean[i], 4), fmt(a.std[i] / G * 1e3, 2), fmt(g.mean[i] * DEG, 4),
+    fmt(g.std[i] * DEG, 4), g.android_bias ? fmt(g.android_bias[i] * DEG, 4) : '–']));
+  rows.push(['|acc|', fmt(Math.hypot(...a.mean), 4), '', '', '', '']);
+  document.getElementById('bias').innerHTML = rows.map((r, k) => '<tr>' + r.map(c => k ? `<td>${c}</td>` : `<th>${c}</th>`).join('') + '</tr>').join('');
+
+  if (g.drift && g.envelope) {
+    const t = g.drift[0], env = g.envelope.i1[2].map(v => v * DEG);
+    charts.c_head.setData([t, g.drift[1].map(v => v * DEG), g.drift[2].map(v => v * DEG), g.drift[3].map(v => v * DEG), env, env.map(v => -v)]);
+  }
+  if (a.drift && a.envelope) {
+    const t = a.drift[0], px = a.drift[4], py = a.drift[5];
+    const e = a.envelope.i2, w = a.envelope.i2_white;
+    charts.c_pos.setData([t, px.map((v, i) => Math.hypot(v, py[i])), e[0].map((v, i) => Math.hypot(v, e[1][i])), w[0].map((v, i) => Math.hypot(v, w[1][i]))]);
+  }
+  for (const [n, id, txt, sc, unit] of [['gyro', 'c_allan_g', 'allan_g_txt', DEG, '°/s'], ['acc', 'c_allan_a', 'allan_a_txt', 1, 'm/s²']]) {
+    const al = ch[n].allan;
+    if (al && al.x) {
+      charts[id].setData([al.x.taus, al.x.adev.map(v => v * sc), al.y.adev.map(v => v * sc), al.z.adev.map(v => v * sc)]);
+      document.getElementById(txt).textContent = 'Fit per axis (x, y, z): white noise N ' + ['x', 'y', 'z'].map(k => sci(al[k].N * sc)).join(', ') +
+        ` ${unit}/√Hz; bias instability B ` + ['x', 'y', 'z'].map(k => sci(al[k].B * sc)).join(', ') + ` ${unit}. Provisional until the run exceeds 1 h.`;
+    }
+  }
+  if (g.slow && g.slow[0].length) {
+    const gs = [g.slow[0].map(v => v / 60)].concat(g.slow.slice(1).map(r => r.map(v => v * DEG)));
+    const bt = s.battery && s.battery[0].length ? [s.battery[0].map(v => v / 60), s.battery[1]] : [[], []];
+    charts.c_temp.setData(uPlot.join([gs, bt]));
+  }
+}
+
+function connect() {
+  const ws = new WebSocket(`ws://${location.host}/ws`);
+  ws.onmessage = e => render(JSON.parse(e.data));
+  ws.onclose = () => { const st = document.getElementById('status'); st.textContent = 'dashboard disconnected'; st.className = 'pill bad'; setTimeout(connect, 1500); };
+}
+document.getElementById('reset').onclick = () => fetch('/reset', { method: 'POST' });
+connect();
+</script>
+</body>
+</html>
