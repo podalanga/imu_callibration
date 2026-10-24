@@ -1,11 +1,6 @@
 __pycache__/
 *.pyc
 .venv/
-firmware/build/
-firmware/sdkconfig
-firmware/sdkconfig.old
-firmware/host/host_replay
-firmware/host/host_fixed
 data/
 runs/
 results/

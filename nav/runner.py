@@ -1,6 +1,7 @@
-"""Causal navigation pipeline: calibration -> ESKF predict -> stop detector -> aiding updates.
+"""Causal drift pipeline: calibration -> ESKF predict -> stop detector -> ZUPT/ZARU aiding.
 
-Same logic as firmware/main/nav.c. Run on any dataset in the common format.
+Shows how far free inertial integration drifts, and how much ZUPT/ZARU (stationary aiding)
+bounds that drift during the phone's still periods. Run on any dataset in the common format.
 """
 from dataclasses import dataclass, asdict
 import numpy as np
@@ -31,13 +32,6 @@ class NavConfig:
     zupt_sigma: float = 0.01       # m/s
     zaru_sigma: float = 0.002      # rad/s
     zupt_every: int = 4            # apply every n-th stationary sample
-    use_nhc: bool = True           # trolley mode only
-    nhc_sigma: float = 0.05
-    nhc_every: int = 10
-    nhc_max_wz: float = 0.3        # rad/s, NHC off while turning
-    use_line: bool = False         # straight-line map constraint (report on and off)
-    line_sigma: float = 0.05
-    line_every: int = 20
     gate: bool = True
 
     def to_dict(self):
@@ -81,7 +75,7 @@ def run(imu, cfg: NavConfig = None, calib: CalibParams = None, oracle_still=None
     f = ESKF(euler2q(roll, pitch, 0.0), bg0=gyro[:n0].mean(axis=0),
              Na=cfg.Na, Ng=cfg.Ng, Kba=cfg.Kba, Kbg=cfg.Kbg, g=cfg.g)
     det = StopDetector(cfg, fs)
-    rows, nis = [], {"zupt": [], "zaru": [], "nhc": [], "line": []}
+    rows, nis = [], {"zupt": [], "zaru": []}
     rejected = {k: 0 for k in nis}
     still_flags = np.zeros(len(t), bool)
     k_still = 0
@@ -100,10 +94,6 @@ def run(imu, cfg: NavConfig = None, calib: CalibParams = None, oracle_still=None
                     nis[name].append(e); rejected[name] += (not ok)
         else:
             k_still = 0
-            if cfg.use_nhc and k % cfg.nhc_every == 0 and abs(gyro[k][2] - f.bg[2]) < cfg.nhc_max_wz:
-                ok, e = f.nhc(cfg.nhc_sigma); nis["nhc"].append(e); rejected["nhc"] += (not ok)
-        if cfg.use_line and k % cfg.line_every == 0:
-            ok, e = f.line(cfg.line_sigma); nis["line"].append(e); rejected["line"] += (not ok)
         rows.append(np.r_[imu.t_us[k], f.p, f.v, f.q, f.ba, f.bg, still])
     return dict(est=np.array(rows), nis={k: np.array(v) for k, v in nis.items()},
                 rejected=rejected, still=still_flags, filter=f)

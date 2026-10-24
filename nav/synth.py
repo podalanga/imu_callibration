@@ -1,8 +1,7 @@
 """Synthetic data with exact ground truth (Chapter 15).
 
-Two generators:
-  calibration_session()  static poses joined by smooth rotations, for testing nav.calib
-  track_run()            the 25 m out-and-back trolley run with stops, for testing the filter
+calibration_session()  static poses joined by smooth rotations, for testing nav.calib
+static_session()       zero motion, pure sensor-error simulation, for testing noise/drift analysis
 
 Both produce *ideal* calibrated signals first, then corrupt them with an ErrorModel.
 """
@@ -112,71 +111,26 @@ def calibration_session(n_poses=40, fs=200.0, t_init=40.0, hold=3.0, move=1.5, g
     return T, W, F, Q
 
 
-# ---------------------------------------------------------------- track run
-def track_run(fs=200.0, length=25.0, spacing=5.0, seg_time=10.0, stop=3.0, t_static=10.0,
-              turn_time=4.0, bump_deg=0.0, bump_hz=3.0, g=G0):
-    """Out-and-back along x: stops at every marker, 180 deg turn at the far end.
+# ---------------------------------------------------------------- static session (drift ground truth)
+def static_session(duration_s=600.0, fs=200.0, g=G0):
+    """Phone at rest, level, for the whole run: ideal signals are exactly zero rotation / zero acceleration.
 
-    Returns t, gyro_ideal, acc_ideal, gt (N,11), markers (K,3).
+    Returns t, gyro_ideal (all zero), acc_ideal (all [0,0,g]), gt (N,11): p=0, v=0, q=identity throughout.
+    Any nonzero position/velocity/attitude a filter reports on this data is pure drift from sensor error.
     """
-    dt = 1.0 / fs
-    n_seg = int(round(length / spacing))
-    plan = [("static", 0.0, 0.0, 0.0, t_static)]
-    for k in range(n_seg):
-        plan += [("move", k * spacing, spacing, 0.0, seg_time), ("static", (k + 1) * spacing, 0, 0.0, stop)]
-    plan += [("turn", length, 0, 0.0, turn_time), ("static", length, 0, np.pi, stop)]
-    for k in range(n_seg):
-        s0 = length - k * spacing
-        plan += [("move", s0, -spacing, np.pi, seg_time), ("static", s0 - spacing, 0, np.pi, stop)]
-    plan[-1] = ("static", 0.0, 0, np.pi, t_static)
-
-    T, S, V, A, YAW, YR, YA = [], [], [], [], [], [], []
-    markers = []
-    t0 = 0.0
-    for i, (kind, s0, ds, yaw, dur) in enumerate(plan):
-        ts = np.arange(0, dur, dt)
-        tau = ts / dur
-        if kind == "static":
-            markers.append((t0 + 0.5 * dur, s0))
-            S += [s0] * len(ts); V += [0] * len(ts); A += [0] * len(ts)
-            YAW += [yaw] * len(ts); YR += [0] * len(ts); YA += [0] * len(ts)
-        elif kind == "move":
-            m, dm, ddm = min_jerk(tau)
-            S += list(s0 + ds * m); V += list(ds * dm / dur); A += list(ds * ddm / dur**2)
-            YAW += [yaw] * len(ts); YR += [0] * len(ts); YA += [0] * len(ts)
-        else:
-            m, dm, ddm = min_jerk(tau)
-            S += [s0] * len(ts); V += [0] * len(ts); A += [0] * len(ts)
-            YAW += list(np.pi * m); YR += list(np.pi * dm / dur); YA += list(np.pi * ddm / dur**2)
-        T += list(t0 + ts)
-        t0 += dur
-    T, S, V, A = map(np.array, (T, S, V, A))
-    YAW, YR = np.array(YAW), np.array(YR)
-    env = np.clip(np.abs(V) / 0.2, 0, 1)          # vibration fades in and out with speed (continuous)
-    amp = np.radians(bump_deg)
-    roll = amp * np.sin(2 * np.pi * bump_hz * T) * env
-    pitch = amp * np.sin(2 * np.pi * bump_hz * 1.3 * T + 1.0) * env
-    droll = np.gradient(roll, T)
-    dpitch = np.gradient(pitch, T)
-    # ZYX Euler rates -> body rates
-    wx = droll - YR * np.sin(pitch)
-    wy = dpitch * np.cos(roll) + YR * np.cos(pitch) * np.sin(roll)
-    wz = -dpitch * np.sin(roll) + YR * np.cos(pitch) * np.cos(roll)
-    gyro = np.column_stack([wx, wy, wz])
-    Q = np.array([euler2q(a, b, c) for a, b, c in zip(roll, pitch, YAW)])
-    acc_w = np.column_stack([A, np.zeros_like(A), np.zeros_like(A)])
-    acc = np.array([q2R(q).T @ (a + np.array([0, 0, g])) for q, a in zip(Q, acc_w)])
-    gt = np.column_stack([np.round(T * 1e6), S, np.zeros_like(S), np.zeros_like(S), Q,
-                          V, np.zeros_like(V), np.zeros_like(V)])
-    mk = np.array([(round(t * 1e6), i, s) for i, (t, s) in enumerate(markers)])
-    return T, gyro, acc, gt, mk
+    t = np.arange(0, duration_s, 1.0 / fs)
+    n = len(t)
+    gyro = np.zeros((n, 3))
+    acc = np.tile([0.0, 0.0, g], (n, 1))
+    q = np.tile([1.0, 0, 0, 0], (n, 1))
+    gt = np.column_stack([np.round(t * 1e6), np.zeros((n, 3)), q, np.zeros((n, 3))])
+    return t, gyro, acc, gt
 
 
-def make_track_dataset(err: ErrorModel, **kw):
-    t, w, f, gt, mk = track_run(**kw)
+def make_static_dataset(err: ErrorModel, **kw):
+    t, w, f, gt = static_session(**kw)
     imu = err.apply(t, w, f)
-    cfg = dict(source="synthetic track_run", track_kw={k: v for k, v in kw.items()}, error_model=err.as_config())
-    return Dataset(imu=imu, markers=mk, gt=gt, config=cfg)
+    return Dataset(imu=imu, gt=gt, config=dict(source="synthetic static_session", error_model=err.as_config()))
 
 
 def make_calibration_dataset(err: ErrorModel, **kw):

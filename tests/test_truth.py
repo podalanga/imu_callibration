@@ -8,7 +8,7 @@ import numpy as np
 import pytest
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from nav import quat, synth, runner, evaluate, calib, attitude
+from nav import quat, synth, runner, calib, attitude
 from nav.eskf import ESKF
 
 G = synth.G0
@@ -34,8 +34,8 @@ def test_body_to_world_direction():
 
 
 def test_gravity_sign_at_rest():
-    # level box at rest reads +g on its up axis (acquisition test A3 in software)
-    t, w, f, gt, mk = synth.track_run(length=5, spacing=5)
+    # level phone at rest reads +g on its up axis (acquisition test A3 in software)
+    t, w, f, gt = synth.static_session(duration_s=1.0)
     assert np.allclose(f[0], [0, 0, G], atol=1e-9)
 
 
@@ -71,12 +71,12 @@ def test_constant_acceleration():
     assert np.allclose(f.v, [1.0, 0, 0], atol=1e-12)
 
 
-def test_noise_free_track_reintegrates():
-    # generator and strapdown agree: whole out-and-back run without errors, no aids
-    ds = synth.make_track_dataset(synth.ErrorModel(**NOISELESS))
-    r = runner.run(ds.imu, runner.NavConfig(use_zupt=False, use_nhc=False))
-    m = evaluate.checkpoint_errors(r["est"], ds.markers)
-    assert m["max_err"] < 1e-3
+def test_noise_free_static_session_does_not_drift():
+    # generator and strapdown agree: a noise-free stationary IMU reintegrates to exactly zero
+    ds = synth.make_static_dataset(synth.ErrorModel(**NOISELESS), duration_s=60.0)
+    r = runner.run(ds.imu, runner.NavConfig(use_zupt=False))
+    assert np.linalg.norm(r["est"][-1, 1:4]) < 1e-6              # position
+    assert np.linalg.norm(r["est"][-1, 4:7]) < 1e-6              # velocity
 
 
 def test_tilt_error_couples_as_derived():
@@ -111,7 +111,7 @@ def test_scalar_zupt_worked_example():
 
 
 def test_covariance_stays_symmetric_positive():
-    ds = synth.make_track_dataset(synth.ErrorModel(seed=2), bump_deg=0.3)
+    ds = synth.make_static_dataset(synth.ErrorModel(seed=2), duration_s=60.0)
     r = runner.run(ds.imu, runner.NavConfig())
     P = r["filter"].P
     assert np.allclose(P, P.T, atol=1e-15)
@@ -119,13 +119,14 @@ def test_covariance_stays_symmetric_positive():
 
 
 # ---------------------------------------------------------------- aided accuracy on synthetic data
-def test_zupt_bounds_error_on_track():
+def test_zupt_bounds_drift_on_static_session():
+    # a phone sitting still: free inertial integration drifts away with accel bias, ZUPT/ZARU bounds it
     err = synth.ErrorModel(ba=np.array([2e-3, -1.5e-3, 1e-3]) * G, bg=np.radians([0.02, -0.02, 0.02]), seed=5)
-    ds = synth.make_track_dataset(err, bump_deg=0.3)
-    free = evaluate.checkpoint_errors(runner.run(ds.imu, runner.NavConfig(use_zupt=False, use_nhc=False))["est"], ds.markers)
-    aided = evaluate.checkpoint_errors(runner.run(ds.imu, runner.NavConfig())["est"], ds.markers)
-    assert free["max_err"] > 10.0          # unaided error explodes
-    assert aided["max_err"] < 1.5          # stops bound it (synthetic, modelled errors only)
+    ds = synth.make_static_dataset(err, duration_s=120.0)
+    free_p = np.linalg.norm(runner.run(ds.imu, runner.NavConfig(use_zupt=False))["est"][-1, 1:4])
+    aided_p = np.linalg.norm(runner.run(ds.imu, runner.NavConfig(use_zupt=True))["est"][-1, 1:4])
+    assert free_p > 1.0           # unaided position error grows unbounded even at rest
+    assert aided_p < 0.05          # ZUPT/ZARU keeps it near zero (synthetic, modelled errors only)
 
 
 # ---------------------------------------------------------------- calibration round trip

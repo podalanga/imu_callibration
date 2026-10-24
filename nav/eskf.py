@@ -1,7 +1,8 @@
 """15-state error-state Kalman filter (Chapter 12). Float64 reference implementation.
 
 Error state order: dp(0:3) dv(3:6) dtheta(6:9) dba(9:12) dbg(12:15).
-The C port in firmware/main/eskf.c mirrors this file line by line.
+Used here to show how free inertial integration drifts and how ZUPT/ZARU (stationary aiding)
+bounds that drift during the phone's still periods.
 """
 import numpy as np
 
@@ -85,25 +86,3 @@ class ESKF:
         H = np.zeros((3, 15)); H[:, 12:15] = np.eye(3)
         return self.update(w_m - self.bg, H, sigma**2 * np.eye(3))
 
-    def nhc(self, sigma):
-        R = q2R(self.q)
-        vb = R.T @ self.v
-        S = np.array([[0, 1.0, 0], [0, 0, 1.0]])
-        H = np.zeros((2, 15))
-        H[:, 3:6] = S @ R.T
-        H[:, 6:9] = S @ skew(vb)
-        return self.update(-(S @ vb), H, sigma**2 * np.eye(2))
-
-    def line(self, sigma, y0=0.0):
-        H = np.zeros((1, 15)); H[0, 1] = 1.0
-        return self.update(np.array([y0 - self.p[1]]), H, np.array([[sigma**2]]))
-
-    def body_velocity(self, v_meas_b, sigma, rows=(0, 1)):
-        """Optical flow (rows 0,1) or wheel speed + NHC (rows 0,1,2)."""
-        R = q2R(self.q)
-        vb = R.T @ self.v
-        S = np.eye(3)[list(rows)]
-        H = np.zeros((len(rows), 15))
-        H[:, 3:6] = S @ R.T
-        H[:, 6:9] = S @ skew(vb)
-        return self.update(np.asarray(v_meas_b) - S @ vb, H, sigma**2 * np.eye(len(rows)))
