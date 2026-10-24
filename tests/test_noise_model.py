@@ -119,3 +119,22 @@ def test_free_drift_matches_prediction_on_white_noise():
     measured = np.sqrt(np.mean(head[:, i] ** 2))
     predicted = nm.predicted_drift(tt[i], TRUE["Ng"][2], 0.0, 0.0, 0.0, t_align=10.0)["heading"]
     assert 0.6 < measured / predicted < 1.6
+
+
+def test_gz_noise_params_reproduce_measured_noise():
+    sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "scripts"))
+    import noise_to_gz
+    imu = _static(minutes=40, Na=TRUE["Na"], Ng=TRUE["Ng"], B_gyro=TRUE["B_gyro"], tau_gyro=TRUE["tau_gyro"])
+    res, _ = nm.characterise([imu])
+    noise = dict(error_model=nm.error_model_params(res))
+    p = noise_to_gz.gz_params(noise, FS)
+    rng = np.random.default_rng(5)
+    sim = _static(minutes=40)                                  # same timestamps, signal replaced by gz noise
+    sim.gyro = np.stack([noise_to_gz.gz_sample(p["gyro"], len(sim.t), FS, rng) for _ in range(3)], axis=1)
+    sim.acc = np.stack([noise_to_gz.gz_sample(p["accel"], len(sim.t), FS, rng) for _ in range(3)], axis=1) + [0, 0, 9.80665]
+    res2, _ = nm.characterise([sim])
+    worst = lambda r, s, k: np.max(nm.axis_array(r, s, k))
+    assert abs(worst(res2, "gyro", "N") / worst(res, "gyro", "N") - 1) < 0.15
+    assert abs(worst(res2, "acc", "N") / worst(res, "acc", "N") - 1) < 0.15
+    ratio = worst(res2, "gyro", "B") / worst(res, "gyro", "B")
+    assert 0.5 < ratio < 2.0, ratio

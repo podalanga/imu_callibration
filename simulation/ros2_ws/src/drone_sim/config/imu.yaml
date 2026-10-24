@@ -4,19 +4,24 @@ noisy_topic: /imu/noisy
 ideal_frame_id: imu_ideal_link
 noisy_frame_id: imu_noisy_link
 # ideal: no <noise> elements at all.
+# Gauss-Markov bias instability (worst axis), gyro bias_stddev = measured turn-on bias size.
+# accel bias_stddev is not measured yet (needs calibration); it keeps the previous value.
 # noisy: gz-sensors gaussian noise, same parameters applied to x, y, z of each channel.
+# from runs/One_hr_drift_test/phone_noise.yaml by scripts/noise_to_gz.py: stddev = N*sqrt(rate_hz), dynamic bias = the measured
+# Gauss-Markov bias instability (worst axis), gyro mean = measured turn-on bias size (constant: gz
+# lets a bias_stddev offset decay to zero within the correlation time). accel offset: not measured yet.
 noisy:
-  gyro:                          # rad/s
-    mean: 0.0
-    stddev: 0.002
-    bias_mean: 0.0
-    bias_stddev: 0.0005
-    dynamic_bias_stddev: 1.0e-05
-    dynamic_bias_correlation_time: 300.0
-  accel:                         # m/s^2
-    mean: 0.0
-    stddev: 0.02
-    bias_mean: 0.0
-    bias_stddev: 0.02
-    dynamic_bias_stddev: 5.0e-04
-    dynamic_bias_correlation_time: 300.0
+  gyro:                          # rad/s; phone
+    mean: 0.00417854
+    stddev: 0.00124695
+    bias_mean: 0
+    bias_stddev: 0
+    dynamic_bias_stddev: 1.54584e-05
+    dynamic_bias_correlation_time: 56.7453
+  accel:                         # m/s^2; phone
+    mean: 0
+    stddev: 0.0168088
+    bias_mean: 0
+    bias_stddev: 0
+    dynamic_bias_stddev: 0.000288664
+    dynamic_bias_correlation_time: 56.7453
