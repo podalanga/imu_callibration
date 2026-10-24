@@ -1,6 +1,7 @@
 __pycache__/
 *.pyc
 .venv/
+.vscode/
 
 # large CSVs, committed as .csv.gz (scripts/pack_for_git.py)
 runs/One_hr_drift_test/imu.csv
