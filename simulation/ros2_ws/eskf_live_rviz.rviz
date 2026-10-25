@@ -1,0 +1,135 @@
+Panels:
+  - Class: rviz_common/Displays
+    Help Height: 78
+    Name: Displays
+    Property Tree Widget:
+      Expanded:
+        - /Global Options1
+        - /Estimated ESKF Path1
+        - /Ground Truth Path1
+        - /Estimated Line1
+        - /Ground Truth Line1
+      Splitter Ratio: 0.5
+    Tree Height: 450
+  - Class: rviz_common/Views
+    Name: Views
+    Expanded: true
+    Splitter Ratio: 0.5
+Visualization Manager:
+  Class: ""
+  Displays:
+    - Alpha: 0.5
+      Cell Size: 1
+      Class: rviz_default_plugins/Grid
+      Color: 160; 160; 164
+      Enabled: true
+      Name: Grid
+      Plane: XY
+      Plane Cell Count: 30
+      Reference Frame: <Fixed Frame>
+      Value: true
+    - Class: rviz_default_plugins/Path
+      Enabled: true
+      Name: Estimated ESKF Path
+      Topic:
+        Depth: 10
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /eskf/estimated_path
+      Value: true
+      Line Style: Lines
+      Line Width: 0.04
+      Color: 30; 210; 70
+    - Class: rviz_default_plugins/Path
+      Enabled: true
+      Name: Ground Truth Path
+      Topic:
+        Depth: 10
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /eskf/ground_truth_path
+      Value: true
+      Line Style: Lines
+      Line Width: 0.04
+      Color: 240; 45; 35
+    - Class: rviz_default_plugins/Marker
+      Enabled: true
+      Name: Estimated Line
+      Topic:
+        Depth: 10
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /eskf/estimated_line
+      Value: true
+    - Class: rviz_default_plugins/Marker
+      Enabled: true
+      Name: Ground Truth Line
+      Topic:
+        Depth: 10
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /eskf/ground_truth_line
+      Value: true
+    - Class: rviz_default_plugins/Odometry
+      Enabled: false
+      Name: ESKF Odometry
+      Topic:
+        Depth: 10
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /eskf/odometry
+      Value: true
+  Enabled: true
+  Global Options:
+    Background Color: 48; 48; 48
+    Fixed Frame: world
+    Frame Rate: 30
+  Name: root
+  Tools:
+    - Class: rviz_default_plugins/Interact
+      Hide Inactive Objects: true
+    - Class: rviz_default_plugins/MoveCamera
+    - Class: rviz_default_plugins/Select
+    - Class: rviz_default_plugins/FocusCamera
+    - Class: rviz_default_plugins/Measure
+    - Class: rviz_default_plugins/SetInitialPose
+      Topic: /initialpose
+    - Class: rviz_default_plugins/SetGoal
+      Topic: /goal_pose
+    - Class: rviz_default_plugins/PublishPoint
+      Single click: true
+      Topic: /clicked_point
+  Transformation:
+    Current:
+      Class: rviz_default_plugins/Orbit
+      Distance: 25
+      Focal Point:
+        X: 0
+        Y: 0
+        Z: 2
+      Pitch: 0.65
+      Yaw: 0.7
+      Target Frame: world
+    Saved: ~
+  Views:
+    Current:
+      Class: rviz_default_plugins/Orbit
+      Distance: 25
+      Focal Point:
+        X: 0
+        Y: 0
+        Z: 2
+      Pitch: 0.65
+      Yaw: 0.7
+      Target Frame: world
+    Saved: ~
+Window Geometry:
+  Height: 900
+  Width: 1400
+  X: 40
+  Y: 40
