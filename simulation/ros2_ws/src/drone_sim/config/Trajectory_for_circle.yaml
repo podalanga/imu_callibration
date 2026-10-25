@@ -1,0 +1,30 @@
+path: circle                  # line = straight passes x_left <-> x_right (original) | circle = circular arcs, see below
+x_left: -5.75                   # take-off point is (x_left, y) for both path types (= drone spawn, climb is vertical)
+x_right: 5.75
+y: 0.0
+n_traversals: 5                 # line: 2.5 rounds (there and back), first goes left -> right, directions alternate
+                                # circle: number of arcs of `sweep_deg` each (360 = laps)
+v_cruise: 0.3                   # slow, constant over ~96% of each 11.5 m pass
+a_max: 0.3
+takeoff_v: 0.4
+takeoff_a: 0.3
+dwell_s: 0.0                    # reverse as soon as the end tolerances are met
+takeoff_settle_s: 5.0           # hover after takeoff until the camera height has settled at 1.10 m
+pos_tol_m: 0.05                 # along-track error at segment end
+vel_tol_mps: 0.05
+land_at_finish: false
+land_v: 0.3
+land_a: 0.3
+land_height_margin_m: 0.03      # final camera height above its on-ground height
+
+# Only used when path: circle. The circle always passes through the take-off point (x_left, y).
+# It must stay inside the UWB cube floor face [-6, 6]^2 and the 20 x 20 m floor: centre = (x_left, y) + radius*(cos b, sin b).
+# With x_left = -5.75, y = 0, bearing 0: the circle spans x in [-5.75, -5.75 + 2*radius], y in [-radius, radius].
+# Every arc is rest-to-rest (the drone stops between arcs, as in the line mode). For one continuous run at constant
+# speed use n_traversals: 1 and a large sweep_deg (e.g. 1800 = 5 laps).
+circle:
+  radius: 3.0                   # m
+  center_bearing_deg: 0.0       # direction from the take-off point to the circle centre (0 = toward +x, 90 = toward +y)
+  sweep_deg: 360.0              # 360 = full lap; e.g. 180 = half circle (a curved pass), 90 = quarter
+  clockwise: false              # false = counter-clockwise seen from above
+  alternate_direction: false    # true = reverse direction after each arc (retraces the arc back and forth, like the line)
