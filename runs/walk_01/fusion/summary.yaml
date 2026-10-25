@@ -1,0 +1,36 @@
+run: walk_01
+imu_rate_hz: 395.1007498255208
+path_m: 33.8026037791456
+return_to_start_m: 0.9500040653120824
+camera_return_to_start_m: 0.8989537058143998
+end_error_m: 0.13538006272798334
+camera_fix_pct: 43.80593499764484
+sync:
+  video_offset_s: -0.009113306989834771
+  rotation_correlation: 0.45635720580562456
+  windows: 76
+  window_s: 0.3
+  axis_residual_deg: 2.0031139265087896
+  fit_to_axes_deg: 12.003595248086555
+R_bc:
+- - 0.0
+  - -1.0
+  - 0.0
+- - -1.0
+  - 0.0
+  - 0.0
+- - 0.0
+  - 0.0
+  - -1.0
+filter:
+  camera_used: 734
+  camera_rejected: 196
+  resets: 13
+imu_only_1m_s: 2.922568306991539
+dropout:
+  off_s: 2.0
+  period_s: 4.0
+  rmse_m: 0.5244999797793751
+  max_m: 2.2411305493205376
+  samples: 489
+layout_lr_half_gap_m: 0.0475

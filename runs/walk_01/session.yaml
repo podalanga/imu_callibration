@@ -1,0 +1,27 @@
+note: tag track, 5 lengths
+phone:
+  model: CPH2661
+  android: '16'
+  serial: 808ac3d4
+  note: tag track, 5 lengths
+  started: '2026-10-25 06:38:43'
+camera:
+  id: 2
+  size: 1920x1080
+  fps: 30
+  frames: 2123
+  scrcpy: C:\Users\msaip\AppData\Local\Microsoft\WinGet\Packages\Genymobile.scrcpy_Microsoft.Winget.Source_8wekyb3d8bbwe\scrcpy-win64-v5.0.1\scrcpy.exe
+    --video-source=camera --camera-id=2 --camera-size=1920x1080 --camera-fps=30 --no-audio
+    --record=runs/walk_01\video.mkv --window-title=walk_01 - recording (Ctrl+C in
+    the terminal to stop)
+laptop_ns:
+  start: 1792890523785302600
+  scrcpy_start: 1792890523783875900
+  first_frame: 1792890524856744100
+  stop: 1792890595534145800
+video_first_frame_sensor_ns: 63130196523693
+imu:
+  acc: 27957
+  gyro: 27962
+sync_note: video t=0 is the first frame; first_frame laptop time -> sensor time via
+  clock.csv; preview latency ~0.1 s, refine with the twist gestures

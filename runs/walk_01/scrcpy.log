@@ -1,0 +1,12 @@
+1792890523816044700 scrcpy 5.0.1 <https://github.com/Genymobile/scrcpy>
+1792890523942869400 INFO: ADB device found:
+1792890523942869400 INFO:     -->   (usb)  808ac3d4                        device  CPH2661
+1792890524011002200 C:\Users\msaip\AppData\Local\Microsoft\WinGet\Packages\Genymobile.scrcpy_Microsoft.Winget.Source_8wekyb3d8bbwe\scrcpy-win64-v5.0.1\scrcpy-server: 1 file pushed, 0 skipped. 30.6 MB/s (733930 bytes in 0.023s)
+1792890524357981700 [server] INFO: Device: [OnePlus] OnePlus CPH2661 (Android 16)
+1792890524430368500 INFO: Recording started to matroska file: runs/walk_01\video.mkv
+1792890524451405300 [server] INFO: Using camera '2'
+1792890524520907500 INFO: Renderer: direct3d11
+1792890524520907500 INFO: Interop: d3d11va
+1792890524596554300 INFO: Video decoding: d3d11va
+1792890524856744100 INFO: Texture (D3D11VA): 1920x1088
+1792890595545934600 INFO: Recording complete to matroska file: runs/walk_01\video.mkv
