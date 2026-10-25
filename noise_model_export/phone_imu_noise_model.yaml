@@ -1,0 +1,42 @@
+# Noise model of the CPH2661 phone IMU (Bosch BMI26x), measured from a 1-hour static recording.
+# Source: runs/One_hr_drift_test (2026-10-24, phone flat on a table, plugged in, 33.1 -> 35.6 degC).
+# 465 s of the 3600 s had small disturbances (people near the table); those seconds were replaced with
+# clean noise from either side before the Allan analysis. Residuals are Gaussian afterwards (kurtosis ~0).
+#
+# Error model per axis (what synth_imu_noise.py does):
+#   reading = truth + b_on + b_gm(t) + b_rw(t) + w(t)      then rounded to one LSB
+#     w     white noise                      per-sample std = N * sqrt(fs)
+#     b_gm  1st-order Gauss-Markov bias      stationary std sigma_gm, correlation time tau_gm
+#     b_rw  bias random walk                 b_rw(k+1) = b_rw(k) + K * sqrt(dt) * n(k)
+#     b_on  turn-on bias                     constant for one power-up
+#
+# Units: gyro rad/s, accel m/s^2. N is the noise density: gyro rad/s/sqrt(Hz), accel m/s^2/sqrt(Hz).
+# K: gyro rad/s^2/sqrt(Hz) (= rad/s/sqrt(s)), accel m/s^3/sqrt(Hz).
+# Frame: Android device frame, x right, y toward the top edge, z out of the screen.
+
+sensor: CPH2661 phone, Bosch BMI26x (Android uncalibrated accel + gyro)
+fs_hz: 395.1                 # sample rate; timestamps are hardware, jitter below
+timestamp_jitter_us: 3.0     # std of sample interval; 0 gaps / 0 dropped samples in the hour
+record_s: 3600
+
+gyro:
+  N:        [9.29e-05, 9.14e-05, 8.39e-05]   # rad/s/sqrt(Hz)  (~0.0053 deg/s/sqrt(Hz), ARW ~0.32 deg/sqrt(h))
+  sigma_gm: [2.48e-04, 1.17e-04, 2.28e-04]   # rad/s           (~0.014, 0.007, 0.013 deg/s)
+  tau_gm:   [52.0, 66.6, 236.0]              # s
+  K:        [1.58e-05, 1.00e-05, 1.67e-05]   # rad/s^2/sqrt(Hz)
+  lsb:      1.0653e-03                       # rad/s (= 2000 dps full scale / 32768)
+  turn_on_bias: [3.64e-03, -5.97e-03, 1.94e-03]   # rad/s, mean static reading of THIS power-up only
+  temp_slope:   [2.2e-04, 1.9e-04, 3.9e-04]       # rad/s per degC, optional, see README
+
+acc:
+  N:        [1.10e-03, 1.17e-03, 1.18e-03]   # m/s^2/sqrt(Hz)  (~115 ug/sqrt(Hz), VRW ~0.07 m/s/sqrt(h))
+  sigma_gm: [2.83e-03, 8.00e-04, 1.65e-03]   # m/s^2
+  tau_gm:   [236.1, 10.7, 6.8]               # s
+  K:        [0.0, 9.9e-05, 2.26e-04]         # m/s^3/sqrt(Hz)
+  lsb:      4.785e-03                        # m/s^2 (= 16 g full scale / 32768)
+  turn_on_bias: [0.0, 0.0, 0.0]              # not separable from tilt/scale in a flat static test; see README
+  temp_slope:   [1.6e-03, 2.3e-03, 5.6e-03]  # m/s^2 per degC, optional, see README
+
+# Raw static means seen in the hour (accel includes gravity, phone tilted ~1.5 deg):
+#   gyro [0.003642, -0.005968, 0.001936] rad/s
+#   acc  [0.2279, -0.1089, 9.835] m/s^2   (|a| = 9.839 vs local g ~9.78: ~+0.06 m/s^2 scale/bias error)
